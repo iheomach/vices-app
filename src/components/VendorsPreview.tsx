@@ -22,6 +22,10 @@ const GoogleMap: React.FC<{
     if (!userLocation) return;
 
     const initMap = () => {
+      if (!window.google || !window.google.maps || !window.google.maps.Map) {
+        setTimeout(initMap, 500);
+        return;
+      }
       const mapElement = document.getElementById('google-map');
       if (!mapElement || map) return;
 
@@ -75,16 +79,71 @@ const GoogleMap: React.FC<{
       setUserMarker(userLocationMarker);
     };
 
-    if (typeof google !== 'undefined' && google.maps) {
-      initMap();
+    // Check if script already exists
+    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+    
+    if (!window.google || !window.google.maps) {
+      if (!existingScript) {
+        // Create global callback for Safari compatibility
+        (window as any).initGoogleMapsCallback = () => {
+          // Wait for all Google Maps components to be available
+          const checkGoogleMapsReady = () => {
+            if (
+              window.google && 
+              window.google.maps && 
+              window.google.maps.Map &&
+              window.google.maps.Marker &&
+              window.google.maps.InfoWindow &&
+              window.google.maps.LatLngBounds
+            ) {
+              try {
+                initMap();
+                // Clean up the global callback
+                delete (window as any).initGoogleMapsCallback;
+              } catch (error) {
+                console.warn('Map initialization failed:', error);
+                setTimeout(checkGoogleMapsReady, 1000);
+              }
+            } else {
+              setTimeout(checkGoogleMapsReady, 300);
+            }
+          };
+          
+          checkGoogleMapsReady();
+        };
+
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&libraries=places&v=3.52&callback=initGoogleMapsCallback`;
+        script.async = true;
+        script.defer = true;
+        script.onerror = (error) => {
+          console.error('Failed to load Google Maps:', error);
+        };
+        document.head.appendChild(script);
+      }
     } else {
-      // Load Google Maps script if not already loaded
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initMap;
-      document.head.appendChild(script);
+      // Google Maps already loaded
+      const checkAndInit = () => {
+        if (
+          window.google && 
+          window.google.maps && 
+          window.google.maps.Map &&
+          window.google.maps.Marker &&
+          window.google.maps.InfoWindow &&
+          window.google.maps.LatLngBounds
+        ) {
+          try {
+            initMap();
+          } catch (error) {
+            console.warn('Map initialization failed on cached load:', error);
+            setTimeout(checkAndInit, 500);
+          }
+        } else {
+          setTimeout(checkAndInit, 300);
+        }
+      };
+      
+      setTimeout(checkAndInit, 200);
     }
   }, [userLocation, map]);
 
@@ -244,6 +303,18 @@ const VendorsPage = () => {
   const vendorsApi = new VendorsApi();
 
   useEffect(() => {
+    // Safari polyfill for Google Maps
+    if (typeof window !== 'undefined' && !window.requestIdleCallback) {
+      window.requestIdleCallback = function(callback) {
+        return setTimeout(callback, 1);
+      };
+      window.cancelIdleCallback = function(id) {
+        clearTimeout(id);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
     // Get user's location and fetch vendors
     const initializeVendors = async () => {
       try {
@@ -365,9 +436,13 @@ const VendorsPage = () => {
       <header className="bg-black/20 backdrop-blur-lg border-b border-green-400/20">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <div className="text-2xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
+            <a
+              href="/"
+              className="text-2xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent hover:underline focus:outline-none"
+              aria-label="Go to home page"
+            >
               VICES
-            </div>
+            </a>
             <span className="text-gray-400">|</span>
             <span className="text-lg font-medium">Local Vendors</span>
           </div>
