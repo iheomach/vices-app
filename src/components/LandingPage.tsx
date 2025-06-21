@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
 interface LocationCoords {
   latitude: number;
   longitude: number;
@@ -12,8 +14,14 @@ interface LocationStatus {
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  
   const handleStartExploring = () => {
-    navigate('/vendors');
+    if (isAuthenticated) {
+      navigate('/vendors');
+    } else {
+      navigate('/login');
+    }
   };
   const [locationStatus, setLocationStatus] = useState<LocationStatus>({
     message: '',
@@ -184,12 +192,32 @@ const LandingPage: React.FC = () => {
             </li>
           </ul>
           
-            <button
-            className="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-1 transition-all"
-            onClick={() => navigate('/usersignup')}
-            >
-            Get Started
-            </button>
+          {isAuthenticated ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-white">Welcome, {user?.first_name || 'User'}!</span>
+              <button
+                className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-1 transition-all"
+                onClick={() => navigate('/user-dashboard')}
+              >
+                My Dashboard
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <button
+                className="text-white hover:text-green-400 font-medium transition-colors"
+                onClick={() => navigate('/login')}
+              >
+                Login
+              </button>
+              <button
+                className="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-1 transition-all"
+                onClick={() => navigate('/usersignup')}
+              >
+                Get Started
+              </button>
+            </div>
+          )}
         </nav>
       </header>
 
@@ -238,34 +266,34 @@ const LandingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: "📍",
-                title: "Location-Based Deals",
-                description: "Find the best deals within walking distance or plan your route to the hottest spots in town. Real-time location tracking ensures you never miss out."
+                icon: "🧬",
+                title: "Smart Product Matching",
+                description: "AI finds products that match your exact preferences, tolerance level, and desired effects. No more guessing - get personalized recommendations that actually work for you."
               },
               {
-                icon: "🤖",
-                title: "AI-Powered Recommendations",
-                description: "Our intelligent system learns your preferences and suggests deals that match your taste and budget. Get personalized recommendations every time."
+                icon: "💡",
+                title: "Tolerance Intelligence",
+                description: "Track your usage patterns to prevent tolerance buildup and optimize effects. Our AI helps you get the most out of every experience while staying safe."
+              },
+              {
+                icon: "🎯",
+                title: "Mood-Based Recommendations",
+                description: "Tell us how you want to feel - creative, relaxed, energetic, or social - and we'll find the perfect cannabis or alcohol products to match your mood."
+              },
+              {
+                icon: "🛡️",
+                title: "Safety First",
+                description: "Advanced safety features check for medication interactions, suggest safer alternatives, and provide dosage guidance based on your personal profile."
+              },
+              {
+                icon: "📅",
+                title: "AI Party Planner",
+                description: "Syncs with your Google Calendar to plan perfect party experiences for concerts, events, and nights out. Get recommendations for any social situation."
               },
               {
                 icon: "💰",
-                title: "Best Price Guarantee",
-                description: "Compare prices across multiple dispensaries and liquor stores. We track deals in real-time so you always get the best bang for your buck."
-              },
-              {
-                icon: "⚡",
-                title: "Real-Time Updates",
-                description: "Get instant notifications when new deals drop or when your favorite products go on sale. Never miss a limited-time offer again."
-              },
-              {
-                icon: "🔐",
-                title: "Secure & Private",
-                description: "Your data is encrypted and your preferences are kept private. Browse and buy with confidence knowing your information is protected."
-              },
-              {
-                icon: "📱",
-                title: "Mobile-First Design",
-                description: "Optimized for on-the-go discovery. Whether you're planning ahead or making spontaneous decisions, Vices works perfectly on any device."
+                title: "Best Local Deals",
+                description: "AI-powered deal scoring across all nearby dispensaries and liquor stores. Compare prices instantly and get alerts when your favorites go on sale."
               }
             ].map((feature, index) => (
               <div key={index} className="glass-effect rounded-2xl p-8 text-center hover-lift">
@@ -288,18 +316,24 @@ const LandingPage: React.FC = () => {
       <section className="py-20 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold mb-8 text-green-400">
-            Ready to Find Deals Near You?
+            {isAuthenticated 
+              ? `Welcome Back, ${user?.first_name || 'Friend'}!` 
+              : 'Ready to Find Deals Near You?'}
           </h2>
           
           <p className="text-xl text-gray-300 mb-10">
-            Enable location access to discover the best weed and alcohol deals in your area right now.
+            {isAuthenticated
+              ? 'Continue exploring deals customized for your preferences.'
+              : 'Enable location access to discover the best weed and alcohol deals in your area right now.'}
           </p>
           
           <button
-            onClick={requestLocation}
+            onClick={isAuthenticated ? handleStartExploring : requestLocation}
             className="bg-gradient-to-r from-red-600 to-red-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl hover:shadow-red-500/40 hover:-translate-y-2 transition-all mb-6"
           >
-            📍 Enable Location & Start Exploring
+            {isAuthenticated 
+              ? '🔍 View Personalized Deals' 
+              : '📍 Enable Location & Start Exploring'}
           </button>
           
           {locationStatus.message && (
