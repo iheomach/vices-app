@@ -21,8 +21,13 @@ class User(AbstractUser):
     
     # Preferences
     receive_deal_notifications = models.BooleanField(default=True)
-    preferred_distance = models.IntegerField(default=25, help_text="Preferred search radius in km")
     
+    # Consumption preferences
+    preferred_categories = models.JSONField(default=list, blank=True, help_text="e.g., ['cannabis', 'wine', 'beer', 'spirits']")
+    tolerance_level = models.CharField(max_length=20, blank=True, help_text="Overall tolerance level")
+    favorite_effects = models.JSONField(default=list, blank=True, help_text="e.g., ['relaxation', 'creativity', 'social']")
+    consumption_goals = models.JSONField(default=list, blank=True, help_text="e.g., ['sleep', 'pain_relief', 'celebration']")
+
     # Account info
     is_verified = models.BooleanField(default=False)
     date_of_birth = models.DateField(null=True, blank=True)

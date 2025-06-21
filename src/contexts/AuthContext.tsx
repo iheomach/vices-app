@@ -17,9 +17,14 @@ interface User {
   latitude: number | null;
   longitude: number | null;
   
+  // Consumption preferences
+  preferred_categories: string[];
+  tolerance_level: string;
+  favorite_effects: string[];
+  consumption_goals: string[];
+
   // Preferences
   receive_deal_notifications: boolean;
-  preferred_distance: number; // km
   
   // Account info
   is_verified: boolean;
@@ -98,7 +103,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchUserProfile = async (authToken: string) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile/`, {
         headers: { 
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json'
@@ -204,8 +209,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             postal_code: '',
             latitude: null,
             longitude: null,
+            preferred_categories: [],
+            tolerance_level: '',
+            favorite_effects: [],
+            consumption_goals: [],
             receive_deal_notifications: true,
-            preferred_distance: 10,
             is_verified: true, // Assuming the user is verified upon successful login
             date_of_birth: null,
             created_at: new Date().toISOString(),
