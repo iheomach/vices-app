@@ -13,6 +13,19 @@ const SignupPage = () => {
     agreeToTerms: false,
     receiveDeals: true
   });
+  const clearForm = () => {
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          password: '',
+          confirmPassword: '',
+          location: '',
+          agreeToTerms: false,
+          receiveDeals: true
+      });
+    };
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -165,9 +178,20 @@ const SignupPage = () => {
       <div className="relative w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-4xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent mb-2">
+            <div
+            className="text-4xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent mb-2 cursor-pointer"
+            onClick={() => window.location.href = "/"}
+            tabIndex={0}
+            role="button"
+            aria-label="Go to homepage"
+            onKeyDown={e => {
+              if (e.key === "Enter" || e.key === " ") {
+              window.location.href = "/";
+              }
+            }}
+            >
             VICES
-          </div>
+            </div>
           <h1 className="text-2xl font-bold text-white mb-2">
             Join the Community
           </h1>
@@ -465,7 +489,9 @@ const SignupPage = () => {
                   Back
                 </button>
                 <button
-                  onClick={handleSubmit}
+                  onClick={() => {
+                    handleSubmit();
+                  }}
                   disabled={isSubmitting}
                   className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-green-500/30 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
@@ -478,6 +504,7 @@ const SignupPage = () => {
                     <>
                       <span>Create Account</span>
                       <Check className="w-5 h-5" />
+                      
                     </>
                   )}
                 </button>
@@ -490,7 +517,14 @@ const SignupPage = () => {
         <div className="text-center mt-6">
           <p className="text-gray-400 text-sm">
             Already have an account?{' '}
-            <a href="#" className="text-green-400 hover:text-green-300 underline font-medium">
+            <a
+              href="/login"
+              className="text-green-400 hover:text-green-300 underline font-medium"
+              onClick={e => {
+              e.preventDefault();
+              window.location.href = '/login';
+              }}
+            >
               Sign in here
             </a>
           </p>

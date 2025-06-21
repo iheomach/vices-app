@@ -12,4 +12,6 @@ urlpatterns = [
     
     # Add your custom register endpoint
     path('register/', views.register_user, name='register_user'),
+
+    path('login/', views.login_user, name='login_user'),
 ]

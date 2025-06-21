@@ -66,3 +66,33 @@ def register_user(request):
         
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login_user(request):
+    try:
+        data = request.data
+        
+        # Validate required fields
+        if not data.get('email') or not data.get('password'):
+            return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Authenticate user
+        user = User.objects.filter(email=data['email']).first()
+        if user and user.check_password(data['password']):
+            return Response({
+                'message': 'Login successful',
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name
+                }
+            }, status=status.HTTP_200_OK)
+        
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
