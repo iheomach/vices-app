@@ -73,7 +73,7 @@ def register_user(request):
 @permission_classes([AllowAny])
 def login_user(request):
     try:
-        data = json.loads(request.body) if isinstance(request.body, bytes) else request.data
+        data = request.data
         
         # Validate required fields
         if not data.get('email') or not data.get('password'):
