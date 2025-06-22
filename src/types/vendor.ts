@@ -1,5 +1,6 @@
 // src/types/vendor.ts
 import { Deal } from './deal';
+
 export interface Vendor {
   id: string;
   name: string;
@@ -8,12 +9,18 @@ export interface Vendor {
   distance: string;
   address: string;
   phone?: string;
-  hours?: string;
-  lat: number;
-  lng: number;
-  deals: Deal[];
-  averageDealScore: number;
-  isPremium?: boolean;
-  place?: google.maps.places.PlaceResult;
+  description: string;
+  image_url?: string;
+  deals?: Deal[];
+  hours_of_operation?: {
+    [key: string]: string;
+  };
+  reviews?: Array<{
+    id: string;
+    user_id: string;
+    rating: number;
+    comment: string;
+    created_at: string;
+  }>;
 }
 

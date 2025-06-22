@@ -179,7 +179,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     
     try {
-      console.log('Login attempt with:', { email, password, remember_me });
+      console.log('Login attempt with:', { email, password });
       
       try {
         const response = await fetch('http://127.0.0.1:8000/api/users/login/', {
@@ -188,7 +188,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          body: JSON.stringify({ email, password, remember_me })
+          body: JSON.stringify({ 
+            email, 
+            password 
+          })
         });
 
         console.log('Login response status:', response.status);

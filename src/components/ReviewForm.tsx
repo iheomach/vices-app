@@ -35,17 +35,26 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ isAuthenticated, onSubmit }) =>
     notes: ''
   });
 
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const effectOptions = ['Relaxed', 'Happy', 'Euphoric', 'Sleepy', 'Creative', 'Focused', 'Pain Relief', 'Anxiety Relief'];
 
-  const handleSubmitReview = () => {
+  const handleSubmitReview = async () => {
     if (!isAuthenticated) {
       alert('Please log in to submit a review');
       return;
     }
     
-    onSubmit(newReview, effectsTracking);
-    setNewReview({ rating: 5, comment: '', effects: [], photos: [] });
-    setEffectsTracking({ onset_time: '', duration: '', intensity: 5, notes: '' });
+    setIsSubmitting(true);
+    try {
+      await onSubmit(newReview, effectsTracking);
+      setNewReview({ rating: 5, comment: '', effects: [], photos: [] });
+      setEffectsTracking({ onset_time: '', duration: '', intensity: 5, notes: '' });
+    } catch (error) {
+      console.error('Error submitting review:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,20 +74,23 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ isAuthenticated, onSubmit }) =>
   if (!isAuthenticated) return null;
 
   return (
-    <div className="bg-slate-700/50 rounded-xl p-6 mb-6">
-      <h4 className="text-lg font-semibold mb-4">Write a Review</h4>
+    <div className="bg-[#1B272C] rounded-lg p-6 mb-6 border border-[#7CC379]/10">
+      <h4 className="text-lg font-semibold text-[#7CC379] mb-4">Write a Review</h4>
       
       {/* Rating */}
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-2">Rating</label>
-        <div className="flex gap-1">
-          {[1, 2, 3, 4, 5].map((star) => (
+        <label className="block text-gray-300 mb-2">Rating</label>
+        <div className="flex gap-2">
+          {[1, 2, 3, 4, 5].map((value) => (
             <button
-              key={star}
-              onClick={() => setNewReview({...newReview, rating: star})}
-              className={`text-2xl ${star <= newReview.rating ? 'text-yellow-400' : 'text-gray-600'}`}
+              key={value}
+              type="button"
+              onClick={() => setNewReview({...newReview, rating: value})}
+              className={`text-2xl ${
+                value <= newReview.rating ? 'text-[#7CC379]' : 'text-gray-500'
+              }`}
             >
-              ⭐
+              ★
             </button>
           ))}
         </div>
@@ -207,15 +219,18 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ isAuthenticated, onSubmit }) =>
           onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
           placeholder="Share your experience with this product..."
           rows={4}
-          className="w-full bg-slate-600 border border-slate-500 rounded-lg px-3 py-2 text-white placeholder-slate-400"
+          className="w-full bg-slate-600 border border-slate-500 rounded-lg px-3 py-2 text-white placeholder-slate-400 resize-none"
         />
       </div>
       
       <button 
         onClick={handleSubmitReview}
-        className="bg-gradient-to-r from-green-500 to-green-600 px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300"
+        disabled={isSubmitting}
+        className={`w-full bg-gradient-to-r from-[#7CC379] to-[#66A363] text-white font-medium py-2 px-4 rounded-lg 
+          hover:shadow-lg hover:shadow-[#7CC379]/25 transition-all duration-300 transform hover:-translate-y-0.5
+          ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
       >
-        Submit Review
+        {isSubmitting ? 'Submitting...' : 'Submit Review'}
       </button>
     </div>
   );

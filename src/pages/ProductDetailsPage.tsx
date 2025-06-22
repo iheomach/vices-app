@@ -127,14 +127,14 @@ const ProductDetailsPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-slate-50">
+    <div className="min-h-screen bg-[#1B272C] text-slate-50">
       {/* Header */}
-      <header className="bg-slate-900/95 backdrop-blur-md border-b border-green-500/20 sticky top-0 z-50">
+      <header className="bg-[#1B272C]/95 backdrop-blur-md border-b border-[#7CC379]/20 sticky top-0 z-50">
         <nav className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold text-green-500 flex items-center gap-2">
+          <div className="text-2xl font-bold text-[#7CC379] flex items-center gap-2">
             🌿 VICES
           </div>
-          <button className="bg-gradient-to-r from-green-500 to-green-600 px-4 py-2 rounded-full text-white font-medium">
+          <button className="bg-gradient-to-r from-[#7CC379] to-[#7CC379]/80 px-4 py-2 rounded-full text-white font-medium">
             Profile
           </button>
         </nav>
@@ -144,7 +144,7 @@ const ProductDetailsPage: React.FC = () => {
         <ProductHeader product={product} />
 
         {/* Tabs */}
-        <div className="bg-slate-800/80 rounded-2xl border border-green-500/20 overflow-hidden">
+        <div className="bg-[#1B272C]/80 rounded-2xl border border-[#7CC379]/20 overflow-hidden">
           <div className="flex border-b border-slate-700">
             {[
               { id: 'details', label: 'Details' },
@@ -156,7 +156,7 @@ const ProductDetailsPage: React.FC = () => {
                 onClick={() => setSelectedTab(tab.id as any)}
                 className={`px-6 py-4 font-medium transition-colors ${
                   selectedTab === tab.id
-                    ? 'text-green-400 border-b-2 border-green-400'
+                    ? 'text-[#7CC379] border-b-2 border-[#7CC379]'
                     : 'text-slate-400 hover:text-slate-300'
                 }`}
               >

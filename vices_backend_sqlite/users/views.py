@@ -73,26 +73,59 @@ def register_user(request):
 @permission_classes([AllowAny])
 def login_user(request):
     try:
-        data = request.data
+        # Parse data from request
+        data = json.loads(request.body) if isinstance(request.body, bytes) else request.data
+        print(f"Login attempt data: {data}")  # Debug print
+        
+        email = data.get('email')
+        password = data.get('password')
         
         # Validate required fields
-        if not data.get('email') or not data.get('password'):
-            return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not email or not password:
+            return Response(
+                {'error': 'Email and password are required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         # Authenticate user
-        user = User.objects.filter(email=data['email']).first()
-        if user and user.check_password(data['password']):
-            return Response({
-                'message': 'Login successful',
-                'user': {
-                    'id': user.id,
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name
-                }
-            }, status=status.HTTP_200_OK)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            print(f"No user found with email: {email}")  # Debug print
+            return Response(
+                {'error': 'Invalid credentials'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
         
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    
+        if not user.check_password(password):
+            print(f"Invalid password for user: {email}")  # Debug print
+            return Response(
+                {'error': 'Invalid credentials'}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        # Login successful
+        print(f"Successful login for user: {email}")  # Debug print
+        return Response({
+            'message': 'Login successful',
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'username': user.username
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except json.JSONDecodeError as e:
+        print(f"JSON decode error: {str(e)}")  # Debug print
+        return Response(
+            {'error': 'Invalid JSON data'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        print(f"Login error: {str(e)}")  # Debug print
+        return Response(
+            {'error': str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
