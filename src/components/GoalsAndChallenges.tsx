@@ -23,7 +23,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
         'Craving management strategies',
         'Gradual reintroduction plan'
       ],
-      expected_benefits: [
+      benefits: [
         'Lower tolerance',
         'Clearer thinking',
         'Better sleep',
@@ -45,7 +45,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
         'Community support',
         'Withdrawal guidance'
       ],
-      expected_benefits: [
+      benefits: [
         'Better sleep',
         'Weight loss',
         'Improved mood',
@@ -67,7 +67,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
         'Dosage optimization',
         'Reflection prompts'
       ],
-      expected_benefits: [
+      benefits: [
         'Enhanced effects',
         'Reduced waste',
         'Better awareness',
@@ -89,7 +89,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
         'Reward system',
         'Social support'
       ],
-      expected_benefits: [
+      benefits: [
         'Improved productivity',
         'Better weekdays',
         'Enhanced weekends',
@@ -128,9 +128,14 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
     return colors[color] || 'bg-gray-500 hover:bg-gray-600';
   };
 
-  const handleStartChallenge = (challenge: Challenge) => {
-    onStartChallenge(challenge);
-    setSelectedChallenge(null);
+  const handleStartChallenge = async (challenge: Challenge) => {
+    try {
+      await onStartChallenge(challenge);
+      setSelectedChallenge(null);
+    } catch (error) {
+      console.error('Failed to start challenge:', error);
+      // Optionally add error handling UI here
+    }
   };
 
   const handleGoalAction = async (goalId: string, action: GoalAction) => {
@@ -365,7 +370,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
             <div className="mb-6">
               <h4 className="font-medium mb-2 text-green-100">Expected Benefits:</h4>
               <div className="flex flex-wrap gap-1">
-                {selectedChallenge.expected_benefits.map((benefit, index) => (
+                {selectedChallenge.benefits.map((benefit, index) => (
                   <span key={index} className="bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full border border-green-400/30">
                     {benefit}
                   </span>

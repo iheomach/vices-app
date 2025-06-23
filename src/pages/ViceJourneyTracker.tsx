@@ -133,7 +133,12 @@ const ViceJourneyTracker: React.FC = () => {
         }
 
         // Process the data safely
-        const safeGoalsData = safeGoals(goalsResponse);
+        let safeGoalsData: Goal[] = [];
+        if (Array.isArray(goalsResponse)) {
+          safeGoalsData = safeGoals(goalsResponse);
+        } else if (goalsResponse && typeof goalsResponse === 'object' && Array.isArray((goalsResponse as any).results)) {
+          safeGoalsData = safeGoals((goalsResponse as any).results);
+        }
         const safeJournalData = safeJournalEntries(journalResponse);
         const safeInsightsData = safeInsights(insightsResponse);
         const safeStats = statsResponse || defaultUserData.stats;
@@ -187,6 +192,34 @@ const ViceJourneyTracker: React.FC = () => {
     console.log('📝 Journal entries:', userData.journalEntries);
   }, [userData]);
 
+  useEffect(() => {
+    if (activeTab === 'goals') {
+      const fetchGoals = async () => {
+        try {
+          setLoading(true);
+          const goalsResponse = await goalsApi.getGoals();
+          console.log('Fetched goals:', goalsResponse);
+          let safeGoalsData: Goal[] = [];
+          if (Array.isArray(goalsResponse)) {
+            safeGoalsData = safeGoals(goalsResponse);
+          } else if (goalsResponse && typeof goalsResponse === 'object' && Array.isArray((goalsResponse as any).results)) {
+            safeGoalsData = safeGoals((goalsResponse as any).results);
+          }
+          setUserData(prev => ({
+            ...prev,
+            goals: safeGoalsData
+          }));
+        } catch (err) {
+          console.error('❌ Failed to fetch goals on tab switch:', err);
+          setError(err instanceof Error ? err.message : 'Failed to fetch goals');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchGoals();
+    }
+  }, [activeTab]);
+
   const handleSaveJournalEntry = async (entryData: Omit<JournalEntry, 'id' | 'user' | 'timestamp'>): Promise<void> => {
     try {
       if (!user?.id) {
@@ -229,24 +262,8 @@ const ViceJourneyTracker: React.FC = () => {
         throw new Error('User not authenticated');
       }
 
-      const newGoal: Omit<Goal, 'id'> = {
-        user: user.id,
-        duration: challenge.duration,
-        challenge: challenge.title,
-        title: challenge.title,
-        description: challenge.description,
-        substance_type: challenge.substance_type,
-        target_value: 100,
-        target_unit: '%',
-        current_value: 0,
-        start_date: new Date().toISOString(),
-        end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'active',
-        progress: 0,
-        benefits: challenge.expected_benefits
-      };
-
-      const savedGoal = await goalsApi.createGoal(newGoal);
+      // Pass the challenge directly to createGoal
+      const savedGoal = await goalsApi.createGoal(challenge);
 
       setUserData(prev => ({
         ...prev,

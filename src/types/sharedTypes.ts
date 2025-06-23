@@ -25,7 +25,7 @@ export interface Challenge {
   difficulty: string;
   participants: number;
   features: string[];
-  expected_benefits: string[];
+  benefits: string[];
   color: string;
 }
 

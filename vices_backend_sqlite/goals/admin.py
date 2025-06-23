@@ -3,14 +3,14 @@ from .models import Goal, AIInsight
 
 @admin.register(Goal)
 class GoalAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', 'type', 'status', 'progress', 'start_date')
-    list_filter = ('type', 'status', 'start_date')
+    list_display = ('title', 'user', 'substance_type', 'status', 'progress', 'start_date')
+    list_filter = ('substance_type', 'status', 'start_date')
     search_fields = ('title', 'description', 'user__email')
     date_hierarchy = 'start_date'
     readonly_fields = ('last_updated',)
     fieldsets = (
         ('Basic Information', {
-            'fields': ('user', 'title', 'description', 'type')
+            'fields': ('user', 'title', 'description', 'substance_type')
         }),
         ('Progress', {
             'fields': ('status', 'progress', 'duration')

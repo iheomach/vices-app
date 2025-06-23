@@ -14,12 +14,12 @@ class GoalViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Goal.objects.filter(user=self.request.user)
         status = self.request.query_params.get('status', None)
-        type = self.request.query_params.get('type', None)
+        substance_type = self.request.query_params.get('substance_type', None)
         
         if status:
             queryset = queryset.filter(status=status)
-        if type:
-            queryset = queryset.filter(type=type)
+        if substance_type:
+            queryset = queryset.filter(substance_type=substance_type)
             
         return queryset.order_by('-start_date')
 
@@ -96,13 +96,16 @@ class GoalViewSet(viewsets.ModelViewSet):
             'paused_goals': goals.filter(status='paused').count(),
             'abandoned_goals': goals.filter(status='abandoned').count(),
             'average_progress': goals.filter(status='active').aggregate(Avg('progress')),
-            'by_type': goals.values('type').annotate(
+            'by_type': goals.values('substance_type').annotate(
                 count=Count('id'),
                 completed=Count('id', filter=Q(status='completed')),
                 avg_progress=Avg('progress')
             )
         }
         return Response(stats)
+    
+
+
 
 class AIInsightViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AIInsightSerializer

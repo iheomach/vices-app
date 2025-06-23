@@ -7,7 +7,7 @@ class Goal(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='goals')
     title = models.CharField(max_length=100)
     description = models.TextField()
-    type = models.CharField(
+    substance_type = models.CharField(
         max_length=20,
         choices=[
             ('cannabis', 'Cannabis'),
@@ -35,6 +35,13 @@ class Goal(models.Model):
     benefits = models.JSONField(default=list)
     challenge = models.CharField(max_length=100)
     start_date = models.DateField(auto_now_add=True)
+    
+    # ADD THESE MISSING FIELDS:
+    target_value = models.FloatField(default=100)
+    target_unit = models.CharField(max_length=20, default='%')
+    current_value = models.FloatField(default=0)
+    end_date = models.DateField(null=True, blank=True)
+    
     last_updated = models.DateTimeField(auto_now=True)
 
 class AIInsight(models.Model):
