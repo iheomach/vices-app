@@ -57,7 +57,7 @@ const UserSignupPage: React.FC = () => {
       }
 
       if (!formData.location.trim()) {
-        newErrors.location = 'Location is required to find local deals';
+        newErrors.location = 'Location is required to provide personalized recommendations';
       }
 
       if (!formData.agreeToTerms) {

@@ -20,15 +20,7 @@ const FeaturesPage: React.FC = () => {
               Track your consumption patterns, get personalized insights, and optimize your experience with AI-powered recommendations.
             </p>
           </div>
-          
-          {/* Personalized Deals */}
-          <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 border border-[#7CC379]/20">
-            <div className="text-[#7CC379] text-4xl mb-4">💰</div>
-            <h3 className="text-xl font-semibold mb-3 text-[#7CC379]">Personalized Deals</h3>
-            <p className="text-gray-300">
-              Get exclusive deals on products that match your preferences and consumption patterns.
-            </p>
-          </div>
+
           
           {/* Smart Recommendations */}
           <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 border border-[#7CC379]/20">

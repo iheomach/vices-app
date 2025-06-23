@@ -7,6 +7,11 @@ class VendorCategory(models.Model):
         ('cannabis', 'Cannabis'),
         ('alcohol', 'Alcohol'),
         ('both', 'Cannabis & Alcohol'),
+        ('wellness', 'Wellness'),
+        ('food', 'Food & Beverage'),
+        ('retail', 'Retail'),
+        ('service', 'Service'),
+        ('other', 'Other'),
     ]
     
     name = models.CharField(max_length=50, choices=CATEGORY_CHOICES, unique=True)

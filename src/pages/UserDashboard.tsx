@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
-
+import { safeArray } from '../utils/safeArray';
 const getTimeBasedGreeting = (): string => {
   const hour = new Date().getHours();
   
@@ -63,38 +63,89 @@ const UserDashboard: React.FC = () => {
     { id: 'energetic', emoji: '⚡', label: 'Energetic' }
   ];
 
-  const recommendations: Recommendation[] = [
-    {
-      id: '1',
-      type: 'OPTIMAL DOSAGE',
-      title: 'Cannabis Micro-dose',
-      description: 'AI suggests 2.5mg THC based on your tolerance and sleep goals. Lower risk, better effects.',
-      aiPrice: '$0.85/dose',
-      safety: 'Low Risk',
-      category: 'Cannabis',
-      confidence: 96
-    },
-    {
-      id: '2',
-      type: 'TIMING OPTIMIZATION',
-      title: 'Evening Wine Window',
-      description: 'Best consumption window: 7-8 PM for your sleep cycle. One glass recommended.',
-      aiPrice: '$12-18/bottle',
-      safety: 'Moderate',
-      category: 'Alcohol',
-      confidence: 89
-    },
-    {
-      id: '3',
-      type: 'TOLERANCE BREAK',
-      title: 'Weekend Pause',
-      description: 'AI detects rising tolerance. 48-hour break could reset sensitivity by 30%.',
-      aiPrice: 'Free',
-      safety: 'Excellent',
-      category: 'Wellness',
-      confidence: 98
-    }
-  ];
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        setIsLoading(true);
+        
+        const prompt = `You are a wellness-focused AI coach for cannabis and alcohol consumption. Generate exactly 3 personalized recommendations in JSON format for a user with the following profile:
+
+User Profile:
+- Primary Goal: Better sleep quality
+- Current Usage: Cannabis 2-3x/week, Alcohol 1-2x/week  
+- Tolerance Level: Low-Medium
+- Time of Day: Evening (7-9 PM)
+- Experience Level: Intermediate
+- Health Focus: Sleep optimization, stress reduction
+
+Requirements:
+1. Generate exactly 3 recommendations
+2. Each must have different "type" categories: choose from [OPTIMAL DOSAGE, TIMING OPTIMIZATION, TOLERANCE BREAK, STRAIN SELECTION, WELLNESS PAUSE, MICRO-DOSING, SAFETY CHECK]
+3. One must be cannabis-related, one alcohol-related, one wellness-related
+4. Include realistic market pricing
+5. Safety levels: Low Risk, Moderate, High Risk, Excellent
+6. Confidence scores: 85-98%
+7. Categories: Cannabis, Alcohol, Wellness
+
+Return ONLY valid JSON array with this exact structure:
+[
+  {
+    "id": "1",
+    "type": "OPTIMAL DOSAGE",
+    "title": "Brief descriptive title",
+    "description": "2-sentence explanation with specific dosage/timing and health benefit",
+    "aiPrice": "Realistic price with unit",
+    "safety": "Risk level",
+    "category": "Cannabis/Alcohol/Wellness",
+    "confidence": 96
+  }
+]
+
+Focus on harm reduction, wellness optimization, and evidence-based recommendations. Be specific with dosages, timing, and expected outcomes.`;
+
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/openai/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch recommendations');
+        }
+
+        const data = await response.json();
+        
+        // Parse the response from OpenAI and extract the recommendations
+        let recommendationData: Recommendation[] = [];
+        
+        try {
+          // The API might return the JSON as a string or already parsed
+          if (typeof data.result === 'string') {
+            recommendationData = JSON.parse(data.result);
+          } else if (Array.isArray(data.result)) {
+            recommendationData = data.result;
+          }
+        } catch (error) {
+          console.error('Error parsing OpenAI response:', error);
+          setRecommendations([]);
+        }
+        
+        setRecommendations(recommendationData);
+      } catch (error) {
+        console.error('Error fetching recommendations:', error);
+        setRecommendations([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
 
   const aiInsights: AIInsight[] = [
     { icon: '🧠', title: 'AI Confidence', value: `${aiConfidence}%`, description: 'Wellness optimization', status: 'optimal' },
@@ -232,7 +283,7 @@ const UserDashboard: React.FC = () => {
 
           {/* AI Insights Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {aiInsights.map((insight, index) => (
+            {safeArray(aiInsights).map((insight, index) => (
               <div
                 key={index}
                 className="bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-[#7CC379]/20 text-center"

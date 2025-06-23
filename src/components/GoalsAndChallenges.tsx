@@ -1,36 +1,9 @@
 import React, { useState } from 'react';
 import { Target, Trophy, Calendar, Users, Star, Play, Pause, CheckCircle } from 'lucide-react';
-
-interface Goal {
-  id: string;
-  title: string;
-  description: string;
-  type: string;
-  duration: string;
-  progress: number;
-  status: string;
-  benefits: string[];
-  challenge: string;
-}
-
-interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  type: string;
-  duration: string;
-  difficulty: string;
-  participants: number;
-  features: string[];
-  expectedBenefits: string[];
-  color: string;
-}
-
-interface GoalsAndChallengesProps {
-  userGoals: Goal[];
-  onStartChallenge: (challenge: Challenge) => void;
-  onUpdateGoal: (goalId: string, action: string) => void;
-}
+import { Goal } from '../types/goals'; // Adjust the import path as necessary
+import { SubstanceType } from '../types/tracking';
+import { Challenge, GoalAction, GoalsAndChallengesProps} from '../types/sharedTypes'; // Adjust the import path as necessary
+import { safeArray } from '../utils/safeArray';
 
 const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onStartChallenge, onUpdateGoal }) => {
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
@@ -40,7 +13,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
       id: 't_break_7',
       title: '🌿 7-Day T-Break',
       description: 'Reset your cannabis tolerance with a guided 7-day break',
-      type: 'cannabis',
+      substance_type: 'cannabis',
       duration: '7 days',
       difficulty: 'Medium',
       participants: 1247,
@@ -50,7 +23,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
         'Craving management strategies',
         'Gradual reintroduction plan'
       ],
-      expectedBenefits: [
+      expected_benefits: [
         'Lower tolerance',
         'Clearer thinking',
         'Better sleep',
@@ -62,7 +35,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
       id: 'dry_january',
       title: '🍷 Dry January',
       description: '31 days alcohol-free with daily support and tracking',
-      type: 'alcohol',
+      substance_type: 'alcohol',
       duration: '31 days',
       difficulty: 'Hard',
       participants: 2156,
@@ -72,7 +45,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
         'Community support',
         'Withdrawal guidance'
       ],
-      expectedBenefits: [
+      expected_benefits: [
         'Better sleep',
         'Weight loss',
         'Improved mood',
@@ -84,7 +57,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
       id: 'mindful_consumption',
       title: '🧘 Mindful Consumption',
       description: '21 days of intentional and conscious substance use',
-      type: 'both',
+      substance_type: 'both',
       duration: '21 days',
       difficulty: 'Easy',
       participants: 892,
@@ -94,7 +67,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
         'Dosage optimization',
         'Reflection prompts'
       ],
-      expectedBenefits: [
+      expected_benefits: [
         'Enhanced effects',
         'Reduced waste',
         'Better awareness',
@@ -106,7 +79,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
       id: 'weekend_warrior',
       title: '📅 Weekend Warrior',
       description: 'Limit consumption to weekends only for 30 days',
-      type: 'both',
+      substance_type: 'both',
       duration: '30 days',
       difficulty: 'Medium',
       participants: 567,
@@ -116,7 +89,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
         'Reward system',
         'Social support'
       ],
-      expectedBenefits: [
+      expected_benefits: [
         'Improved productivity',
         'Better weekdays',
         'Enhanced weekends',
@@ -160,8 +133,8 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
     setSelectedChallenge(null);
   };
 
-  const handleGoalAction = (goalId: string, action: string) => {
-    onUpdateGoal(goalId, action);
+  const handleGoalAction = async (goalId: string, action: GoalAction) => {
+    await onUpdateGoal(goalId, action);
   };
 
   const getStatusIcon = (status: string) => {
@@ -252,7 +225,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
           </div>
         ) : (
           <div className="space-y-4">
-            {userGoals.map((goal) => (
+            {safeArray(userGoals).map((goal) => (
               <div key={goal.id} className="bg-black/30 rounded-lg p-4 border border-green-500/20">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-3">
@@ -265,20 +238,40 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
                     </span>
                     <div className="flex space-x-1">
                       {goal.status === 'active' && (
+                      <>
                         <button
-                          onClick={() => handleGoalAction(goal.id, 'pause')}
-                          className="p-1 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 border border-yellow-400/30"
+                        onClick={() => handleGoalAction(goal.id, 'pause')}
+                        className="p-1 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 border border-yellow-400/30"
+                        title="Pause goal"
                         >
-                          <Pause className="w-4 h-4" />
+                        <Pause className="w-4 h-4" />
                         </button>
+                        <button
+                        onClick={() => handleGoalAction(goal.id, 'complete')}
+                        className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 border border-green-400/30"
+                        title="Mark as complete"
+                        >
+                        <CheckCircle className="w-4 h-4" />
+                        </button>
+                        <button
+                        onClick={() => handleGoalAction(goal.id, 'checkin')}
+                        className="p-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 border border-blue-400/30"
+                        title="Daily check-in"
+                        >
+                        <Calendar className="w-4 h-4" />
+                        </button>
+                      </>
                       )}
                       {goal.status === 'paused' && (
+                      <>
                         <button
-                          onClick={() => handleGoalAction(goal.id, 'resume')}
-                          className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 border border-green-400/30"
+                        onClick={() => handleGoalAction(goal.id, 'resume')}
+                        className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 border border-green-400/30"
+                        title="Resume goal"
                         >
-                          <Play className="w-4 h-4" />
+                        <Play className="w-4 h-4" />
                         </button>
+                      </>
                       )}
                     </div>
                   </div>
@@ -304,9 +297,9 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
                 <div>
                   <p className="text-sm font-medium mb-2 text-green-100">Expected Benefits:</p>
                   <div className="flex flex-wrap gap-1">
-                    {goal.benefits.map((benefit, index) => (
+                    {safeArray<string>(goal.benefits).map((benefit: string, index: number) => (
                       <span key={index} className="bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full border border-green-400/30">
-                        {benefit}
+                      {benefit}
                       </span>
                     ))}
                   </div>
@@ -372,7 +365,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
             <div className="mb-6">
               <h4 className="font-medium mb-2 text-green-100">Expected Benefits:</h4>
               <div className="flex flex-wrap gap-1">
-                {selectedChallenge.expectedBenefits.map((benefit, index) => (
+                {selectedChallenge.expected_benefits.map((benefit, index) => (
                   <span key={index} className="bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full border border-green-400/30">
                     {benefit}
                   </span>

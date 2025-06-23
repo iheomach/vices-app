@@ -424,8 +424,7 @@ const VicesLandingPage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Pricing Section */}
+{/* Pricing Section */}
       <section id="pricing" className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -487,7 +486,7 @@ const VicesLandingPage: React.FC = () => {
                 buttonColor: "bg-purple-600 hover:bg-purple-700"
               }
             ].map((plan, index) => (
-              <div key={index} className={`relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 ${plan.color} rounded-2xl p-8`}>
+              <div key={index} className={`relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 ${plan.color} rounded-2xl p-8 flex flex-col`}>
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <span className="bg-[#7CC379] text-white px-4 py-1 rounded-full text-sm font-semibold">
@@ -496,14 +495,14 @@ const VicesLandingPage: React.FC = () => {
                   </div>
                 )}
                 
-                <div className="text-center">
+                <div className="text-center flex-1 flex flex-col">
                   <h3 className="text-2xl font-bold mb-2 text-white">{plan.name}</h3>
                   <div className="mb-6">
                     <span className="text-4xl font-bold text-[#7CC379]">{plan.price}</span>
                     <span className="text-green-100/60">/{plan.period}</span>
                   </div>
                   
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-8 flex-1">
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-center space-x-3">
                         <span className="text-[#7CC379]">✓</span>
@@ -512,7 +511,7 @@ const VicesLandingPage: React.FC = () => {
                     ))}
                   </ul>
                   
-                  <button className={`w-full py-3 rounded-lg font-semibold transition-all ${plan.buttonColor}`}>
+                  <button className={`w-full py-3 rounded-lg font-semibold transition-all mt-auto ${plan.buttonColor}`}>
                     {plan.name === "Mindful" ? "Start Free" : "Begin Wellness Journey"}
                   </button>
                 </div>

@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 // User interface matching your Django User model
 interface User {
-  id: number;
+  id: string;
   email: string;
   username: string;
   first_name: string;
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchUserProfile = async (authToken: string) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile/`, {
         headers: { 
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json'
@@ -143,7 +143,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       console.log('Sending registration data:', formattedData);
       
-      const response = await fetch('http://127.0.0.1:8000/api/users/register/', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formattedData)
@@ -154,12 +154,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (response.ok) {
         // Create a temporary token since the backend doesn't provide one yet
-        const tempToken = btoa(`${userData.email}:${new Date().getTime()}`);
-        setToken(tempToken);
+        setToken(data.token);
         setUser(data.user);
         
         // For registration, we default to using localStorage (similar to remember me)
-        localStorage.setItem('authToken', tempToken);
+        localStorage.setItem('authToken', data.token);
         localStorage.setItem('userData', JSON.stringify(data.user));
       } else {
         throw new Error(data.error || 'Registration failed');
@@ -182,7 +181,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.log('Login attempt with:', { email, password });
       
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/users/login/', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/login/`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -226,18 +225,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(userData);
           
           // Since we're not using tokens yet in the backend, we'll create a simple token
-          const tempToken = btoa(`${email}:${new Date().getTime()}`);
-          setToken(tempToken);
+          setToken(data.token);
           
           // Store authentication info based on remember_me option
           if (remember_me) {
             // Store in localStorage (persists even when browser is closed)
-            localStorage.setItem('authToken', tempToken);
+            localStorage.setItem('authToken', data.token);
             localStorage.setItem('userData', JSON.stringify(userData));
             console.log('Credentials stored in localStorage (Remember Me enabled)');
           } else {
             // Store in sessionStorage (cleared when browser is closed)
-            sessionStorage.setItem('authToken', tempToken);
+            sessionStorage.setItem('authToken', data.token);
             sessionStorage.setItem('userData', JSON.stringify(userData));
             console.log('Credentials stored in sessionStorage (Remember Me disabled)');
           }

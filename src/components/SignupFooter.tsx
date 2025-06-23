@@ -32,10 +32,6 @@ const SignupFooter: React.FC = () => {
             <div className="text-xs text-gray-400">Local Vendors</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-purple-400 mb-1">200+</div>
-            <div className="text-xs text-gray-400">Exclusive Deals</div>
-          </div>
-          <div>
             <div className="text-2xl font-bold text-blue-400 mb-1">24/7</div>
             <div className="text-xs text-gray-400">Live Updates</div>
           </div>

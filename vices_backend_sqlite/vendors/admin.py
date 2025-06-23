@@ -1,7 +1,6 @@
 # vendors/admin.py
 from django.contrib import admin
 from .models import VendorCategory, Vendor, Product, Review
-from deals.models import Deal
 
 
 @admin.register(VendorCategory)

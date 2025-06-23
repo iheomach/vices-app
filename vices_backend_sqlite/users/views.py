@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.authtoken.models import Token  # ✅ ADD THIS IMPORT
 import json
 
 User = get_user_model()
@@ -54,6 +55,9 @@ def register_user(request):
                 password=make_password(data['password']),
             )
             
+            # ✅ CREATE TOKEN FOR NEW USER
+            token, created = Token.objects.get_or_create(user=user)
+            
         return Response({
             'message': 'User created successfully',
             'user': {
@@ -61,7 +65,8 @@ def register_user(request):
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name
-            }
+            },
+            'token': token.key  # ✅ RETURN REAL TOKEN
         }, status=status.HTTP_201_CREATED)
         
     except Exception as e:
@@ -104,6 +109,9 @@ def login_user(request):
                 status=status.HTTP_401_UNAUTHORIZED
             )
         
+        # ✅ CREATE OR GET TOKEN FOR USER
+        token, created = Token.objects.get_or_create(user=user)
+        
         # Login successful
         print(f"Successful login for user: {email}")  # Debug print
         return Response({
@@ -114,7 +122,8 @@ def login_user(request):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'username': user.username
-            }
+            },
+            'token': token.key  # ✅ RETURN REAL TOKEN
         }, status=status.HTTP_200_OK)
         
     except json.JSONDecodeError as e:

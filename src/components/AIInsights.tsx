@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Brain, TrendingUp, AlertTriangle, Lightbulb, BarChart3, Zap, Shield, Target } from 'lucide-react';
-
+import { safeArray } from '../utils/safeArray'; // Adjust the import path as necessary
 interface Insight {
   type: string;
   title: string;
@@ -168,7 +168,7 @@ Key patterns identified:
               <p className="text-sm">Add more journal entries to generate personalized insights</p>
             </div>
           ) : (
-            insights.map((insight, index) => (
+            safeArray(insights).map((insight, index) => (
               <div key={index} className={`flex items-start space-x-4 p-4 rounded-lg border ${getInsightSeverityStyle(insight.severity)}`}>
                 <div className="mt-1">{getInsightIcon(insight.type)}</div>
                 <div className="flex-1">

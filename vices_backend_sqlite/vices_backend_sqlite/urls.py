@@ -17,9 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import path, include
+from products.openai_views import generate_recommendations
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),
     path('api/vendors/', include('vendors.urls')),
+    path('api/goals/', include('goals.urls')),
+    path('api/tracking/', include('tracking.urls')),
+    path('api/openai/', generate_recommendations, name='openai_recommendations'),
 ]

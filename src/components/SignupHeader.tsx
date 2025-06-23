@@ -29,7 +29,7 @@ const SignupHeader: React.FC<SignupHeaderProps> = ({ currentStep }) => {
           Join the Community
         </h1>
         <p className="text-gray-400">
-          Unlock exclusive deals on cannabis & alcohol
+          Discover smarter consumption
         </p>
       </div>
 

@@ -1,28 +1,10 @@
 import React from 'react';
 import { CheckCircle, Moon, Heart, Target, TrendingUp, Award, BarChart3, Brain } from 'lucide-react';
+import { Goal } from '../types/goals'; // Adjust the import path as necessary
+import { Insight } from '../types/sharedTypes'
+import { Stats } from '../types/tracking'; // Adjust the import path as necessary
+import { safeArray, safeSlice } from '../utils/safeArray';
 
-interface Goal {
-  id: string;
-  title: string;
-  duration: string;
-  progress: number;
-  challenge: string;
-}
-
-interface Insight {
-  type: string;
-  title: string;
-  message: string;
-  severity: string;
-}
-
-interface Stats {
-  mindfulDays?: number;
-  sleepQuality?: number;
-  sleepImprovement?: number;
-  moodAverage?: number;
-  moodTrend?: string;
-}
 
 interface DashboardProps {
   goals: Goal[];
@@ -34,21 +16,21 @@ const Dashboard: React.FC<DashboardProps> = ({ goals, insights, stats }) => {
   const quickStats = [
     {
       label: 'This Week',
-      value: `${stats?.mindfulDays || 5} days`,
+      value: `${stats?.mindful_days || 5} days`,
       subtitle: 'Mindful usage',              icon: <CheckCircle className="w-8 h-8 text-[#7CC379]" />,
       color: 'text-[#7CC379]'
     },
     {
       label: 'Sleep Quality',
-      value: `${stats?.sleepQuality || 7.2}/10`,
-      subtitle: `+${stats?.sleepImprovement || 0.8} vs last week`,
+      value: `${stats?.sleep_quality || 7.2}/10`,
+      subtitle: `+${stats?.sleep_improvement || 0.8} vs last week`,
       icon: <Moon className="w-8 h-8 text-blue-400" />,
       color: 'text-blue-400'
     },
     {
       label: 'Mood Average',
-      value: `${stats?.moodAverage || 7.5}/10`,
-      subtitle: stats?.moodTrend || 'Stable',
+      value: `${stats?.mood_average || 7.5}/10`,
+      subtitle: stats?.mood_trend || 'Stable',
       icon: <Heart className="w-8 h-8 text-purple-400" />,
       color: 'text-purple-400'
     },
@@ -85,6 +67,10 @@ const Dashboard: React.FC<DashboardProps> = ({ goals, insights, stats }) => {
     }
   };
 
+  // ✅ Safe array handling
+  const safeGoals = Array.isArray(goals) ? goals : [];
+  const safeInsights = Array.isArray(insights) ? insights : [];
+
   return (
     <div className="space-y-6">
       {/* Quick Stats */}
@@ -107,7 +93,7 @@ const Dashboard: React.FC<DashboardProps> = ({ goals, insights, stats }) => {
       <div className="bg-black/20 backdrop-blur-lg border border-green-400/20 rounded-xl p-6">
         <h3 className="text-lg font-semibold mb-4 text-green-100">Active Challenges</h3>
         <div className="space-y-4">
-          {goals.map((goal) => (
+          {safeGoals.length > 0 ? safeArray(goals).map(goal => (
             <div key={goal.id} className="bg-black/30 rounded-lg p-4 border border-green-500/20">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium text-white">{goal.title}</h4>
@@ -124,7 +110,11 @@ const Dashboard: React.FC<DashboardProps> = ({ goals, insights, stats }) => {
                 <span className="text-green-300">{goal.challenge}</span>
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="text-center py-4 text-green-200/60">
+              No goals available
+            </div>
+          )}
         </div>
       </div>
 
@@ -132,15 +122,21 @@ const Dashboard: React.FC<DashboardProps> = ({ goals, insights, stats }) => {
       <div className="bg-black/20 backdrop-blur-lg border border-green-400/20 rounded-xl p-6">
         <h3 className="text-lg font-semibold mb-4 text-green-100">Recent Insights</h3>
         <div className="space-y-3">
-          {insights.slice(0, 3).map((insight, index) => (
-            <div key={index} className={`flex items-start space-x-3 p-3 rounded-lg border ${getInsightBgColor(insight.severity)}`}>
-              {getInsightIcon(insight.type)}
-              <div className="flex-1">
-                <h4 className="font-medium text-sm text-white">{insight.title}</h4>
-                <p className="text-green-100/70 text-sm">{insight.message}</p>
+          {safeInsights.length > 0 ? (
+            safeSlice(insights, 0, 3).map((insight, index) => (
+              <div key={index} className={`flex items-start space-x-3 p-3 rounded-lg border ${getInsightBgColor(insight.severity)}`}>
+                {getInsightIcon(insight.type)}
+                <div className="flex-1">
+                  <h4 className="font-medium text-sm text-white">{insight.title}</h4>
+                  <p className="text-green-100/70 text-sm">{insight.message}</p>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="text-center py-4 text-green-200/60">
+              No insights available yet
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

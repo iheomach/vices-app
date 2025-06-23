@@ -28,7 +28,6 @@ const PricingPage: React.FC = () => {
       features: [
         'Advanced AI journey tracking',
         'Personalized recommendations',
-        'Exclusive vendor deals',
         'Priority support',
         'Wellness goal tracking',
         'Advanced analytics'

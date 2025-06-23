@@ -73,7 +73,7 @@ const LoginPage = () => {
             Welcome Back
           </h1>
           <p className="text-gray-400">
-            Sign in to discover personalized deals
+            Sign in to master mindful consumption
           </p>
         </div>
 
