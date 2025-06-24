@@ -1,16 +1,21 @@
 from pathlib import Path
+import os
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-your-secret-key-here'
+OUTSCRAPER_API_KEY = os.environ.get('OUTSCRAPER_API_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+SECRET_KEY = 'django-insecure-ni%z2@xb84%6n^y*r=6@786hfy3z56)qrs1rnnvz6a$9l=updv'
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,12 +25,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     # Your apps
     'users',
     'vendors',
     'deals',
     'locations',
+    'tracking',
+    'goals'
 ]
 
 MIDDLEWARE = [
@@ -108,6 +116,16 @@ REST_FRAMEWORK = {
         # Allow unauthenticated access for registration
         'rest_framework.permissions.AllowAny',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',
+        'user': '1000/hour'
+    }
 }
 
 # CORS settings (for development)
@@ -130,3 +148,98 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+OUTSCRAPER_RATE_LIMIT = {
+    'REQUESTS_PER_MINUTE': 30,  # Adjust based on your plan
+    'REQUESTS_PER_HOUR': 1000,  # Adjust based on your plan
+}
+
+# Vendor search settings
+VENDOR_SEARCH_SETTINGS = {
+    'DEFAULT_RADIUS': 5000,  # meters
+    'MAX_RADIUS': 25000,     # meters
+    'MAX_RESULTS_PER_QUERY': 20,
+    'MAX_TOTAL_RESULTS': 50,
+    'CACHE_TIMEOUT': 300,    # 5 minutes cache for search results
+    'FALLBACK_TO_SAMPLES': True,  # Use sample data if API fails
+}
+
+# API timeout settings
+API_TIMEOUTS = {
+    'OUTSCRAPER': 15,  # seconds
+    'GOOGLE_MAPS': 10,  # seconds
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 300,  # 5 minutes default
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,
+            'CULL_FREQUENCY': 3,
+        }
+    }
+}
+
+# For production with Redis (uncomment and configure):
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION': 'redis://127.0.0.1:6379/1',
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#         },
+#         'KEY_PREFIX': 'vices_app',
+#         'TIMEOUT': 300,
+#     }
+# }
+
+
+
+# API Rate Limiting and Optimization
+VENDOR_SEARCH_CONFIG = {
+    'CACHE_TIMEOUT_SECONDS': 300,  # 5 minutes
+    'MAX_OUTSCRAPER_REQUESTS_PER_MINUTE': 10,
+    'MAX_RESULTS_PER_QUERY': 15,
+    'MAX_TOTAL_RESULTS': 50,
+    'REQUEST_TIMEOUT_SECONDS': 10,
+    'FALLBACK_TO_SAMPLES': True,
+    'PRIORITIZE_DATABASE_VENDORS': True,
+}
+
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'vendor_search.log',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'vendors.views': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}

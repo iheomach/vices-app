@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 // User interface matching your Django User model
 interface User {
-  id: number;
+  id: string;
   email: string;
   username: string;
   first_name: string;
@@ -17,9 +17,14 @@ interface User {
   latitude: number | null;
   longitude: number | null;
   
+  // Consumption preferences
+  preferred_categories: string[];
+  tolerance_level: string;
+  favorite_effects: string[];
+  consumption_goals: string[];
+
   // Preferences
   receive_deal_notifications: boolean;
-  preferred_distance: number; // km
   
   // Account info
   is_verified: boolean;
@@ -98,7 +103,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchUserProfile = async (authToken: string) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/users/profile/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile/`, {
         headers: { 
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json'
@@ -138,7 +143,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       console.log('Sending registration data:', formattedData);
       
-      const response = await fetch('http://127.0.0.1:8000/api/users/register/', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formattedData)
@@ -149,12 +154,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (response.ok) {
         // Create a temporary token since the backend doesn't provide one yet
-        const tempToken = btoa(`${userData.email}:${new Date().getTime()}`);
-        setToken(tempToken);
+        setToken(data.token);
         setUser(data.user);
         
         // For registration, we default to using localStorage (similar to remember me)
-        localStorage.setItem('authToken', tempToken);
+        localStorage.setItem('authToken', data.token);
         localStorage.setItem('userData', JSON.stringify(data.user));
       } else {
         throw new Error(data.error || 'Registration failed');
@@ -174,16 +178,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     
     try {
-      console.log('Login attempt with:', { email, password, remember_me });
+      console.log('Login attempt with:', { email, password });
       
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/users/login/', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/login/`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          body: JSON.stringify({ email, password, remember_me })
+          body: JSON.stringify({ 
+            email, 
+            password 
+          })
         });
 
         console.log('Login response status:', response.status);
@@ -204,8 +211,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             postal_code: '',
             latitude: null,
             longitude: null,
+            preferred_categories: [],
+            tolerance_level: '',
+            favorite_effects: [],
+            consumption_goals: [],
             receive_deal_notifications: true,
-            preferred_distance: 10,
             is_verified: true, // Assuming the user is verified upon successful login
             date_of_birth: null,
             created_at: new Date().toISOString(),
@@ -215,18 +225,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(userData);
           
           // Since we're not using tokens yet in the backend, we'll create a simple token
-          const tempToken = btoa(`${email}:${new Date().getTime()}`);
-          setToken(tempToken);
+          setToken(data.token);
           
           // Store authentication info based on remember_me option
           if (remember_me) {
             // Store in localStorage (persists even when browser is closed)
-            localStorage.setItem('authToken', tempToken);
+            localStorage.setItem('authToken', data.token);
             localStorage.setItem('userData', JSON.stringify(userData));
             console.log('Credentials stored in localStorage (Remember Me enabled)');
           } else {
             // Store in sessionStorage (cleared when browser is closed)
-            sessionStorage.setItem('authToken', tempToken);
+            sessionStorage.setItem('authToken', data.token);
             sessionStorage.setItem('userData', JSON.stringify(userData));
             console.log('Credentials stored in sessionStorage (Remember Me disabled)');
           }

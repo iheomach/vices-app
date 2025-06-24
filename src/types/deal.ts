@@ -1,6 +1,6 @@
 // src/types/deal.ts
 export interface Deal {
-  id: number;
+  id: string;
   product: string;
   original: string;
   sale: string;

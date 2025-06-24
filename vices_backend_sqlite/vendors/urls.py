@@ -7,7 +7,8 @@ router.register(r'', views.VendorViewSet, basename='vendor')
 router.register(r'categories', views.VendorCategoryViewSet, basename='vendor-category')
 
 urlpatterns = [
-    path('', include(router.urls)),
     path('search/', views.VendorSearchView.as_view(), name='vendor-search'),
     path('nearby/', views.NearbyVendorsView.as_view(), name='nearby-vendors'),
+    path('', include(router.urls)),
+
 ]

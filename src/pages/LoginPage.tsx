@@ -45,7 +45,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-green-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#1B272C] flex items-center justify-center p-6">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl"></div>
@@ -56,7 +56,7 @@ const LoginPage = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div
-            className="text-4xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent mb-2 cursor-pointer"
+            className="text-4xl font-bold bg-gradient-to-r from-[#7CC379] to-[#7CC379]/80 bg-clip-text text-transparent mb-2 cursor-pointer"
             onClick={() => window.location.href = "/"}
             tabIndex={0}
             role="button"
@@ -73,7 +73,7 @@ const LoginPage = () => {
             Welcome Back
           </h1>
           <p className="text-gray-400">
-            Sign in to discover personalized deals
+            Sign in to master mindful consumption
           </p>
         </div>
 
@@ -155,7 +155,7 @@ const LoginPage = () => {
                 </div>
                 <button 
                   type="button"
-                  className="text-sm text-green-400 hover:text-green-300 font-medium transition-colors"
+                  className="text-sm text-[#7CC379] hover:text-[#7CC379]/80 font-medium transition-colors"
                 >
                   Forgot password?
                 </button>
