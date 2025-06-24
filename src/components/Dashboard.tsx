@@ -2,7 +2,7 @@ import React from 'react';
 import { CheckCircle, Moon, Heart, Target, TrendingUp, Award, BarChart3, Brain } from 'lucide-react';
 import { Goal } from '../types/goals'; // Adjust the import path as necessary
 import { Insight } from '../types/sharedTypes'
-import { Stats } from '../types/tracking'; // Adjust the import path as necessary
+import { Stats, JournalEntry } from '../types/tracking'; // Adjust the import path as necessary
 import { safeArray, safeSlice } from '../utils/safeArray';
 
 
@@ -10,33 +10,119 @@ interface DashboardProps {
   goals: Goal[];
   insights: Insight[];
   stats: Stats;
+  journalEntries: JournalEntry[];
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ goals, insights, stats }) => {
+const Dashboard: React.FC<DashboardProps> = ({ goals, insights, stats, journalEntries }) => {
+  // Calculate real metrics from journal entries
+  const calculateMindfulDays = (): number => {
+    if (!journalEntries || journalEntries.length === 0) return 0;
+    
+    // Count days in the last 7 days where user logged entries
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const recentEntries = journalEntries.filter(entry => 
+      new Date(entry.timestamp) >= oneWeekAgo
+    );
+    
+    const uniqueDays = new Set(
+      recentEntries.map(entry => 
+        new Date(entry.timestamp).toDateString()
+      )
+    );
+    
+    return uniqueDays.size;
+  };
+
+  const calculateAverageSleepQuality = (): number => {
+    if (!journalEntries || journalEntries.length === 0) return 0;
+    
+    const totalSleepQuality = journalEntries.reduce((sum, entry) => 
+      sum + (entry.sleep_quality || 0), 0
+    );
+    
+    return Math.round((totalSleepQuality / journalEntries.length) * 10) / 10;
+  };
+
+  const calculateSleepImprovement = (): number => {
+    if (!journalEntries || journalEntries.length < 7) return 0;
+    
+    // Sort entries by date
+    const sortedEntries = [...journalEntries].sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+    
+    const recentEntries = sortedEntries.slice(0, Math.min(7, sortedEntries.length));
+    const olderEntries = sortedEntries.slice(7, Math.min(14, sortedEntries.length));
+    
+    if (olderEntries.length === 0) return 0;
+    
+    const recentAvg = recentEntries.reduce((sum, entry) => sum + (entry.sleep_quality || 0), 0) / recentEntries.length;
+    const olderAvg = olderEntries.reduce((sum, entry) => sum + (entry.sleep_quality || 0), 0) / olderEntries.length;
+    
+    return Math.round((recentAvg - olderAvg) * 10) / 10;
+  };
+
+  const calculateAverageMood = (): number => {
+    if (!journalEntries || journalEntries.length === 0) return 0;
+    
+    const totalMood = journalEntries.reduce((sum, entry) => 
+      sum + (entry.mood || 0), 0
+    );
+    
+    return Math.round((totalMood / journalEntries.length) * 10) / 10;
+  };
+
+  const calculateMoodTrend = (): string => {
+    if (!journalEntries || journalEntries.length < 7) return 'Stable';
+    
+    const sortedEntries = [...journalEntries].sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+    
+    const recentEntries = sortedEntries.slice(0, Math.min(7, sortedEntries.length));
+    const olderEntries = sortedEntries.slice(7, Math.min(14, sortedEntries.length));
+    
+    if (olderEntries.length === 0) return 'Stable';
+    
+    const recentAvg = recentEntries.reduce((sum, entry) => sum + (entry.mood || 0), 0) / recentEntries.length;
+    const olderAvg = olderEntries.reduce((sum, entry) => sum + (entry.mood || 0), 0) / olderEntries.length;
+    
+    const difference = recentAvg - olderAvg;
+    
+    if (difference > 1) return 'Improving';
+    if (difference < -1) return 'Declining';
+    return 'Stable';
+  };
+
+  const activeGoalsCount = goals?.filter(goal => goal.status === 'active').length || 0;
+
   const quickStats = [
     {
       label: 'This Week',
-      value: `${stats?.mindful_days || 5} days`,
-      subtitle: 'Mindful usage',              icon: <CheckCircle className="w-8 h-8 text-[#7CC379]" />,
+      value: `${calculateMindfulDays()} days`,
+      subtitle: 'Mindful usage',
+      icon: <CheckCircle className="w-8 h-8 text-[#7CC379]" />,
       color: 'text-[#7CC379]'
     },
     {
       label: 'Sleep Quality',
-      value: `${stats?.sleep_quality || 7.2}/10`,
-      subtitle: `+${stats?.sleep_improvement || 0.8} vs last week`,
+      value: `${calculateAverageSleepQuality()}/10`,
+      subtitle: `${calculateSleepImprovement() > 0 ? '+' : ''}${calculateSleepImprovement()} vs last week`,
       icon: <Moon className="w-8 h-8 text-blue-400" />,
       color: 'text-blue-400'
     },
     {
       label: 'Mood Average',
-      value: `${stats?.mood_average || 7.5}/10`,
-      subtitle: stats?.mood_trend || 'Stable',
+      value: `${calculateAverageMood()}/10`,
+      subtitle: calculateMoodTrend(),
       icon: <Heart className="w-8 h-8 text-purple-400" />,
       color: 'text-purple-400'
     },
     {
       label: 'Active Goals',
-      value: `${goals?.length || 3}`,
+      value: `${activeGoalsCount}`,
       subtitle: 'In progress',
       icon: <Target className="w-8 h-8 text-orange-400" />,
       color: 'text-orange-400'

@@ -14,47 +14,67 @@ const FeaturesPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
           {/* AI Journey Tracker */}
           <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 border border-[#7CC379]/20">
-            <div className="text-[#7CC379] text-4xl mb-4">🧠</div>
-            <h3 className="text-xl font-semibold mb-3 text-[#7CC379]">AI Journey Tracker</h3>
-            <p className="text-gray-300">
-              Track your consumption patterns, get personalized insights, and optimize your experience with AI-powered recommendations.
+            <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-[#7CC379] to-[#5a9556] rounded-full flex items-center justify-center text-white">
+              <span className="text-4xl">🧠</span>
+            </div>
+            <h3 className="text-xl font-semibold mb-4 text-[#7CC379] text-center">AI Journey Tracker</h3>
+            <p className="text-green-100/70 leading-relaxed text-center">
+              Track consumption, analyze patterns, and get personalized insights with our advanced AI system. Set goals, join challenges, and optimize your experience.
             </p>
           </div>
 
-          
-          {/* Smart Recommendations */}
+          {/* Wellness Optimization */}
           <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 border border-[#7CC379]/20">
-            <div className="text-[#7CC379] text-4xl mb-4">🎯</div>
-            <h3 className="text-xl font-semibold mb-3 text-[#7CC379]">Smart Recommendations</h3>
-            <p className="text-gray-300">
-              Discover products and experiences tailored to your goals and preferences.
+            <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white">
+              <span className="text-4xl">🎯</span>
+            </div>
+            <h3 className="text-xl font-semibold mb-4 text-[#7CC379] text-center">Wellness Optimization</h3>
+            <p className="text-green-100/70 leading-relaxed text-center">
+              AI-powered recommendations for dosage, timing, and substance selection based on your goals, tolerance, and lifestyle patterns.
             </p>
           </div>
-          
-          {/* Community Insights */}
+
+          {/* Smart Insights */}
           <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 border border-[#7CC379]/20">
-            <div className="text-[#7CC379] text-4xl mb-4">👥</div>
-            <h3 className="text-xl font-semibold mb-3 text-[#7CC379]">Community Insights</h3>
-            <p className="text-gray-300">
-              Learn from shared experiences and contribute to a knowledgeable community.
+            <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white">
+              <span className="text-4xl">⚡</span>
+            </div>
+            <h3 className="text-xl font-semibold mb-4 text-[#7CC379] text-center">Smart Insights</h3>
+            <p className="text-green-100/70 leading-relaxed text-center">
+              Advanced analytics reveal consumption patterns, health correlations, and optimization opportunities unique to your journey.
             </p>
           </div>
-          
-          {/* Wellness Goals */}
+
+          {/* Health & Safety */}
           <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 border border-[#7CC379]/20">
-            <div className="text-[#7CC379] text-4xl mb-4">🎯</div>
-            <h3 className="text-xl font-semibold mb-3 text-[#7CC379]">Wellness Goals</h3>
-            <p className="text-gray-300">
-              Set and track personal wellness goals with AI-guided optimization.
+            <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center text-white">
+              <span className="text-4xl">🛡️</span>
+            </div>
+            <h3 className="text-xl font-semibold mb-4 text-[#7CC379] text-center">Health & Safety</h3>
+            <p className="text-green-100/70 leading-relaxed text-center">
+              Comprehensive safety monitoring, interaction warnings, tolerance management, and educational resources for responsible use.
             </p>
           </div>
-          
-          {/* Privacy First */}
+
+          {/* Community Support */}
           <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 border border-[#7CC379]/20">
-            <div className="text-[#7CC379] text-4xl mb-4">🔒</div>
-            <h3 className="text-xl font-semibold mb-3 text-[#7CC379]">Privacy First</h3>
-            <p className="text-gray-300">
-              Your data is encrypted and secure. You control what you share.
+            <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white">
+              <span className="text-4xl">👥</span>
+            </div>
+            <h3 className="text-xl font-semibold mb-4 text-[#7CC379] text-center">Community Support</h3>
+            <p className="text-green-100/70 leading-relaxed text-center">
+              Connect with like-minded individuals, join wellness challenges, and get support through anonymous communities and peer networks.
+            </p>
+          </div>
+
+          {/* Premium Analytics */}
+          <div className="bg-white/5 backdrop-blur-lg rounded-xl p-8 border border-[#7CC379]/20">
+            <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center text-white">
+              <span className="text-4xl">📊</span>
+            </div>
+            <h3 className="text-xl font-semibold mb-4 text-[#7CC379] text-center">Premium Analytics</h3>
+            <p className="text-green-100/70 leading-relaxed text-center">
+              Deep health insights, biometric integration, predictive modeling, and comprehensive wellness reports with premium features.
             </p>
           </div>
         </div>

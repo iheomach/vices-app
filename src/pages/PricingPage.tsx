@@ -12,12 +12,14 @@ const PricingPage: React.FC = () => {
       period: 'forever',
       description: 'Perfect for getting started',
       features: [
-        'Basic consumption tracking',
-        'Community access',
-        'Limited AI insights',
-        'Basic product recommendations'
+        'Basic journal tracking (5 entries/month)',
+        'Simple mood & sleep logging',
+        'Basic dashboard overview',
+        'One active goal at a time',
+        'Weekly AI insights',
+        'Community access'
       ],
-      cta: 'Get Started',
+      cta: 'Start Free',
       ctaAction: () => navigate('/usersignup')
     },
     {
@@ -26,31 +28,17 @@ const PricingPage: React.FC = () => {
       period: 'per month',
       description: 'For optimized wellness',
       features: [
-        'Advanced AI journey tracking',
-        'Personalized recommendations',
+        'Unlimited journal entries',
+        'Advanced tracking & analytics',
+        'Multiple goals & challenges',
+        'Detailed AI insights & recommendations',
+        'Data export (CSV/PDF)',
         'Priority support',
-        'Wellness goal tracking',
-        'Advanced analytics'
+        'Ad-free experience'
       ],
       highlighted: true,
-      cta: 'Start Free Trial',
+      cta: 'Begin Wellness Journey',
       ctaAction: () => navigate('/usersignup')
-    },
-    {
-      name: 'Business',
-      price: 'Custom',
-      period: 'per month',
-      description: 'For vendors and partners',
-      features: [
-        'All Premium features',
-        'Business dashboard',
-        'Customer insights',
-        'API access',
-        'Dedicated support',
-        'Custom analytics'
-      ],
-      cta: 'Contact Sales',
-      ctaAction: () => window.location.href = 'mailto:sales@vices.com'
     }
   ];
 
@@ -68,7 +56,7 @@ const PricingPage: React.FC = () => {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -118,11 +106,7 @@ const PricingPage: React.FC = () => {
           ))}
         </div>
         
-        <div className="mt-16 text-center">
-          <p className="text-gray-400">
-            All plans come with a 14-day free trial. No credit card required.
-          </p>
-        </div>
+
       </main>
     </div>
   );

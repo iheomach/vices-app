@@ -247,16 +247,15 @@ const DailyJournal: React.FC<DailyJournalProps> = ({
             safeArray(journalEntries)
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .map((entry, index) => (
-                <div key={index} className="bg-black/30 rounded-lg p-4 border border-green-500/20">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-white">{entry.date}</span>
-                    <div className="flex items-center space-x-4 text-sm">
+                <div key={index} className="bg-black/30 rounded-xl p-6 border border-green-500/20 mb-2 space-y-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-medium text-white text-base">{entry.date}</span>
+                    <div className="flex items-center space-x-6 text-sm">
                       <span className="text-green-200">Mood: {entry.mood}/10</span>
                       <span className="text-green-200">Sleep: {entry.sleep_quality || entry.sleep}/10</span>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 text-sm mb-2">
+                  <div className="grid grid-cols-2 gap-6 text-sm mb-2">
                     <div>
                       <span className="text-green-100/70">Substance: </span>
                       <span className="text-white">{entry.substance || 'Not specified'}</span>
@@ -266,26 +265,23 @@ const DailyJournal: React.FC<DailyJournalProps> = ({
                       <span className="text-white">{entry.amount || 'Not specified'}</span>
                     </div>
                   </div>
-                  
                   {entry.effects && (
                     <div className="text-sm mb-2">
                       <span className="text-green-100/70">Effects: </span>
                       <span className="text-white">{entry.effects}</span>
                     </div>
                   )}
-                  
                   {entry.notes && (
                     <p className="text-green-100/70 text-sm mb-2">{entry.notes}</p>
                   )}
-                  
                   {entry.tags && entry.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-2 mt-2">
                       {(entry.tags || []).map((tag: string, tagIndex: number) => (
                         <span key={tagIndex} className="bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full border border-green-400/30">
-                        {tag}
+                          {tag}
                         </span>
                       ))}
-                      </div>
+                    </div>
                   )}
                 </div>
               ))

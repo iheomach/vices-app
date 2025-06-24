@@ -368,6 +368,7 @@ const ViceJourneyTracker: React.FC = () => {
             goals={userData.goals}
             insights={userData.insights}
             stats={userData.stats}
+            journalEntries={userData.journalEntries}
           />
         );
       case 'journal':
@@ -440,24 +441,14 @@ const ViceJourneyTracker: React.FC = () => {
             {renderActiveTab()}
           </div>
 
-          <div className="mt-8 bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-[#7CC379]/20">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div className="space-y-2">
-                <div className="text-2xl font-bold text-[#7CC379]">{safeJournalEntries(userData.journalEntries).length}</div>
-                <div className="text-sm text-gray-300">Journal Entries</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-2xl font-bold text-[#7CC379]">{safeGoals(userData.goals).length}</div>
-                <div className="text-sm text-gray-300">Active Goals</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-2xl font-bold text-[#7CC379]">{safeInsights(userData.insights).length}</div>
-                <div className="text-sm text-gray-300">AI Insights</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-2xl font-bold text-[#7CC379]">{userData.stats?.mindful_days || 0}</div>
-                <div className="text-sm text-gray-300">Mindful Days</div>
-              </div>
+          <div className="mt-8 max-w-xl mx-auto bg-[#101C1F] rounded-2xl p-6 border border-[#7CC379]/20 flex justify-center items-center">
+            <div className="flex-1 text-center">
+              <div className="text-3xl font-bold text-[#7CC379]">7</div>
+              <div className="text-base text-gray-300">Journal Entries</div>
+            </div>
+            <div className="flex-1 text-center">
+              <div className="text-3xl font-bold text-[#7CC379]">3</div>
+              <div className="text-base text-gray-300">Active Goals</div>
             </div>
           </div>
         </div>

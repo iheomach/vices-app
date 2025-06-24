@@ -303,105 +303,112 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
           </div>
         ) : (
           <div className="space-y-4">
-            {safeArray(userGoals).map((goal) => (
-              <div key={goal.id} className="bg-black/30 rounded-lg p-4 border border-green-500/20">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    {getStatusIcon(goal.status)}
-                    <h4 className="font-medium text-white">{goal.title}</h4>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm px-3 py-1 bg-green-500/20 text-green-300 rounded-full border border-green-400/30">
-                      Day {goal.current_value} of {goal.duration.split(' ')[0]}
-                    </span>
-                    <div className="flex space-x-1">
-                      {goal.status === 'active' && (
-                      <>
-                        <button
-                        onClick={() => handleGoalAction(goal.id, 'pause')}
-                        className="p-1 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 border border-yellow-400/30"
-                        title="Pause goal"
-                        >
-                        <Pause className="w-4 h-4" />
-                        </button>
-                        <button
-                        onClick={() => handleGoalAction(goal.id, 'complete')}
-                        className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 border border-green-400/30"
-                        title="Mark as complete"
-                        >
-                        <CheckCircle className="w-4 h-4" />
-                        </button>
-                        <button
-                        onClick={() => handleDailyCheckin(goal)}
-                        className={`p-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 border border-blue-400/30 ${checkinState[goal.id] === getToday() ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        title="Daily check-in"
-                        disabled={checkinState[goal.id] === getToday()}
-                        >
-                        <Calendar className="w-4 h-4" />
-                        </button>
-                      </>
-                      )}
-                      {goal.status === 'paused' && (
-                      <>
-                        <button
-                        onClick={() => handleGoalAction(goal.id, 'resume')}
-                        className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 border border-green-400/30"
-                        title="Resume goal"
-                        >
-                        <Play className="w-4 h-4" />
-                        </button>
-                      </>
-                      )}
+            {safeArray(userGoals)
+              .sort((a, b) => {
+                const statusOrder: Record<string, number> = { active: 0, paused: 1, completed: 2 };
+                const aOrder = statusOrder[a.status as string] ?? 3;
+                const bOrder = statusOrder[b.status as string] ?? 3;
+                return aOrder - bOrder;
+              })
+              .map((goal) => (
+                <div key={goal.id} className="bg-black/30 rounded-lg p-4 border border-green-500/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      {getStatusIcon(goal.status)}
+                      <h4 className="font-medium text-white">{goal.title}</h4>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm px-3 py-1 bg-green-500/20 text-green-300 rounded-full border border-green-400/30">
+                        Day {goal.current_value} of {goal.duration.split(' ')[0]}
+                      </span>
+                      <div className="flex space-x-1">
+                        {goal.status === 'active' && (
+                        <>
+                          <button
+                          onClick={() => handleGoalAction(goal.id, 'pause')}
+                          className="p-1 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 border border-yellow-400/30"
+                          title="Pause goal"
+                          >
+                          <Pause className="w-4 h-4" />
+                          </button>
+                          <button
+                          onClick={() => handleGoalAction(goal.id, 'complete')}
+                          className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 border border-green-400/30"
+                          title="Mark as complete"
+                          >
+                          <CheckCircle className="w-4 h-4" />
+                          </button>
+                          <button
+                          onClick={() => handleDailyCheckin(goal)}
+                          className={`p-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 border border-blue-400/30 ${checkinState[goal.id] === getToday() ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          title="Daily check-in"
+                          disabled={checkinState[goal.id] === getToday()}
+                          >
+                          <Calendar className="w-4 h-4" />
+                          </button>
+                        </>
+                        )}
+                        {goal.status === 'paused' && (
+                        <>
+                          <button
+                          onClick={() => handleGoalAction(goal.id, 'resume')}
+                          className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 border border-green-400/30"
+                          title="Resume goal"
+                          >
+                          <Play className="w-4 h-4" />
+                          </button>
+                        </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <p className="text-green-100/70 text-sm mb-3">{goal.description}</p>
-                
-                <div className="w-full bg-slate-700/50 rounded-full h-3 mb-3">
-                  <div 
-                    className="bg-gradient-to-r from-green-400 to-emerald-400 h-3 rounded-full transition-all"
-                    style={{ width: `${goal.current_value / goal.target_value * 100}%` }}
-                  ></div>
-                </div>
-                
-                <div className="flex items-center justify-between text-sm mb-3">
-                  <span className="text-green-100/70">{(goal.current_value / goal.target_value * 100).toFixed(1)}% complete</span>
+                  
+                  <p className="text-green-100/70 text-sm mb-3">{goal.description}</p>
+                  
+                  <div className="w-full bg-slate-700/50 rounded-full h-3 mb-3">
+                    <div 
+                      className="bg-gradient-to-r from-green-400 to-emerald-400 h-3 rounded-full transition-all"
+                      style={{ width: `${goal.current_value / goal.target_value * 100}%` }}
+                    ></div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm mb-3">
+                    <span className="text-green-100/70">{(goal.current_value / goal.target_value * 100).toFixed(1)}% complete</span>
+                    {goal.status === 'active' && (
+                      <span className="text-green-300 flex items-center space-x-1">
+                        <Star className="w-4 h-4" />
+                        <span>Keep going!</span>
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm font-medium mb-2 text-green-100">Expected Benefits:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {safeArray<string>(goal.benefits).map((benefit: string, index: number) => (
+                        <span key={index} className="bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full border border-green-400/30">
+                        {benefit}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
                   {goal.status === 'active' && (
-                    <span className="text-green-300 flex items-center space-x-1">
-                      <Star className="w-4 h-4" />
-                      <span>Keep going!</span>
-                    </span>
+                    <div className="mt-3 pt-3 border-t border-green-500/20">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-green-100/70">Today's check-in:</span>
+                        <button
+                          onClick={() => handleDailyCheckin(goal)}
+                          className={`bg-green-500 hover:bg-green-600 px-3 py-1 rounded text-xs font-medium ${checkinState[goal.id] === getToday() ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          disabled={checkinState[goal.id] === getToday()}
+                        >
+                          Complete Daily Check-in
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
-                
-                <div>
-                  <p className="text-sm font-medium mb-2 text-green-100">Expected Benefits:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {safeArray<string>(goal.benefits).map((benefit: string, index: number) => (
-                      <span key={index} className="bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full border border-green-400/30">
-                      {benefit}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                {goal.status === 'active' && (
-                  <div className="mt-3 pt-3 border-t border-green-500/20">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-green-100/70">Today's check-in:</span>
-                      <button
-                        onClick={() => handleDailyCheckin(goal)}
-                        className={`bg-green-500 hover:bg-green-600 px-3 py-1 rounded text-xs font-medium ${checkinState[goal.id] === getToday() ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={checkinState[goal.id] === getToday()}
-                      >
-                        Complete Daily Check-in
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>
