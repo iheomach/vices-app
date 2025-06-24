@@ -35,8 +35,8 @@ export class GoalsApi extends BaseApi {
       status: 'active',
       progress: 0,
       challenge: challenge.id,
-      // Add the missing fields with sensible defaults
-      target_value: 100,
+      // Use the challenge's target_value if provided
+      target_value: challenge.target_value || 100,
       target_unit: '%',
       current_value: 0,
       end_date: endDate

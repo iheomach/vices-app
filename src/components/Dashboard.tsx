@@ -93,7 +93,7 @@ const Dashboard: React.FC<DashboardProps> = ({ goals, insights, stats }) => {
       <div className="bg-black/20 backdrop-blur-lg border border-green-400/20 rounded-xl p-6">
         <h3 className="text-lg font-semibold mb-4 text-green-100">Active Challenges</h3>
         <div className="space-y-4">
-          {safeGoals.length > 0 ? safeArray(goals).map(goal => (
+          {safeGoals.filter(goal => goal.status === 'active').length > 0 ? safeGoals.filter(goal => goal.status === 'active').map(goal => (
             <div key={goal.id} className="bg-black/30 rounded-lg p-4 border border-green-500/20">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium text-white">{goal.title}</h4>

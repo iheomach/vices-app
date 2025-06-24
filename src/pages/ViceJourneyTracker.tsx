@@ -392,6 +392,8 @@ const ViceJourneyTracker: React.FC = () => {
             insights={userData.insights}
             personalizedRecommendations={[]}
             onRequestAnalysis={handleRequestAnalysis}
+            userGoals={userData.goals}
+            journalEntries={userData.journalEntries}
           />
         );
       default:
@@ -403,12 +405,6 @@ const ViceJourneyTracker: React.FC = () => {
     <div className="min-h-screen bg-[#1B272C] text-white flex flex-col">
       <Header />
 
-      {/* Debug info - remove in production */}
-      <div className="bg-red-900/20 text-red-200 p-2 text-xs">
-        Debug: Journal Entries Count: {userData.journalEntries?.length || 0} | 
-        Loading: {loading.toString()} | 
-        Auth: {isAuthenticated.toString()}
-      </div>
 
       <main className="flex-1 pt-20">
         <div className="max-w-6xl mx-auto px-6 py-8">

@@ -1,12 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Target, Trophy, Calendar, Users, Star, Play, Pause, CheckCircle } from 'lucide-react';
 import { Goal } from '../types/goals'; // Adjust the import path as necessary
 import { SubstanceType } from '../types/tracking';
 import { Challenge, GoalAction, GoalsAndChallengesProps} from '../types/sharedTypes'; // Adjust the import path as necessary
 import { safeArray } from '../utils/safeArray';
+import { GoalsApi } from '../services/api/goalsApi';
+
+const goalsApi = new GoalsApi();
 
 const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onStartChallenge, onUpdateGoal }) => {
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+  const [deletingAll, setDeletingAll] = useState(false);
+
+  // --- Daily Check-in State ---
+  // Structure: { [goalId]: 'YYYY-MM-DD' }
+  const [checkinState, setCheckinState] = useState<{ [goalId: string]: string }>({});
+
+  // Helper to get today's date as YYYY-MM-DD
+  const getToday = () => new Date().toISOString().split('T')[0];
+
+  // Load check-in state from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('goalCheckins');
+    if (stored) {
+      setCheckinState(JSON.parse(stored));
+    }
+  }, []);
+
+  // Save check-in state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('goalCheckins', JSON.stringify(checkinState));
+  }, [checkinState]);
+
+  // Handler for daily check-in
+  const handleDailyCheckin = async (goal: Goal) => {
+    if (checkinState[goal.id] === getToday()) return;
+    const newCurrentValue = (goal.current_value || 0) + 1;
+    const newProgress = Math.min(Math.round((newCurrentValue / (goal.target_value || 1)) * 100), 100);
+    try {
+      await goalsApi.updateGoal(goal.id, {
+        current_value: newCurrentValue,
+        progress: newProgress
+      });
+      setCheckinState(prev => ({ ...prev, [goal.id]: getToday() }));
+    } catch (err) {
+      console.error('Failed to check in:', err);
+    }
+  };
 
   const availableChallenges: Challenge[] = [
     {
@@ -17,6 +57,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
       duration: '7 days',
       difficulty: 'Medium',
       participants: 1247,
+      target_value: 7,
       features: [
         'Daily check-ins and tips',
         'Alternative activity suggestions',
@@ -39,6 +80,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
       duration: '31 days',
       difficulty: 'Hard',
       participants: 2156,
+      target_value: 31,
       features: [
         'Mocktail recipes',
         'Health benefit tracking',
@@ -61,6 +103,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
       duration: '21 days',
       difficulty: 'Easy',
       participants: 892,
+      target_value: 21,
       features: [
         'Pre-consumption meditation',
         'Intention setting exercises',
@@ -83,6 +126,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
       duration: '30 days',
       difficulty: 'Medium',
       participants: 567,
+      target_value: 30,
       features: [
         'Weekday alternatives',
         'Motivation tracking',
@@ -98,6 +142,9 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
       color: 'orange'
     }
   ];
+
+  // Helper to get challenge by id
+  const getChallengeById = (challengeId: string) => availableChallenges.find(c => c.id === challengeId);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -130,7 +177,8 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
 
   const handleStartChallenge = async (challenge: Challenge) => {
     try {
-      await onStartChallenge(challenge);
+      // Pass the challenge with its target_value to onStartChallenge
+      await onStartChallenge({ ...challenge, target_value: challenge.target_value });
       setSelectedChallenge(null);
     } catch (error) {
       console.error('Failed to start challenge:', error);
@@ -154,8 +202,33 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
     }
   };
 
+  // Handler to delete all goals
+  const handleClearAllChallenges = async () => {
+    if (!userGoals.length) return;
+    setDeletingAll(true);
+    try {
+      await Promise.all(userGoals.map(goal => goalsApi.deleteGoal(goal.id)));
+      // Optionally, refresh the UI or call a prop to reload goals
+      window.location.reload(); // simplest way to refresh
+    } catch (err) {
+      console.error('Failed to delete all goals:', err);
+    } finally {
+      setDeletingAll(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Clear All Challenges Button */}
+      <div className="flex justify-end mb-2">
+        <button
+          onClick={handleClearAllChallenges}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50"
+          disabled={deletingAll || !userGoals.length}
+        >
+          {deletingAll ? 'Clearing...' : 'Clear All Challenges'}
+        </button>
+      </div>
       {/* Available Challenges */}
       <div className="bg-black/20 backdrop-blur-lg border border-green-400/20 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
@@ -239,7 +312,7 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm px-3 py-1 bg-green-500/20 text-green-300 rounded-full border border-green-400/30">
-                      Day {Math.floor((goal.progress / 100) * parseInt(goal.duration))} of {goal.duration.split(' ')[0]}
+                      Day {goal.current_value} of {goal.duration.split(' ')[0]}
                     </span>
                     <div className="flex space-x-1">
                       {goal.status === 'active' && (
@@ -259,9 +332,10 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
                         <CheckCircle className="w-4 h-4" />
                         </button>
                         <button
-                        onClick={() => handleGoalAction(goal.id, 'checkin')}
-                        className="p-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 border border-blue-400/30"
+                        onClick={() => handleDailyCheckin(goal)}
+                        className={`p-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 border border-blue-400/30 ${checkinState[goal.id] === getToday() ? 'opacity-50 cursor-not-allowed' : ''}`}
                         title="Daily check-in"
+                        disabled={checkinState[goal.id] === getToday()}
                         >
                         <Calendar className="w-4 h-4" />
                         </button>
@@ -287,16 +361,18 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
                 <div className="w-full bg-slate-700/50 rounded-full h-3 mb-3">
                   <div 
                     className="bg-gradient-to-r from-green-400 to-emerald-400 h-3 rounded-full transition-all"
-                    style={{ width: `${goal.progress}%` }}
+                    style={{ width: `${goal.current_value / goal.target_value * 100}%` }}
                   ></div>
                 </div>
                 
                 <div className="flex items-center justify-between text-sm mb-3">
-                  <span className="text-green-100/70">{goal.progress}% complete</span>
-                  <span className="text-green-300 flex items-center space-x-1">
-                    <Star className="w-4 h-4" />
-                    <span>Keep going!</span>
-                  </span>
+                  <span className="text-green-100/70">{(goal.current_value / goal.target_value * 100).toFixed(1)}% complete</span>
+                  {goal.status === 'active' && (
+                    <span className="text-green-300 flex items-center space-x-1">
+                      <Star className="w-4 h-4" />
+                      <span>Keep going!</span>
+                    </span>
+                  )}
                 </div>
                 
                 <div>
@@ -314,9 +390,10 @@ const GoalsAndChallenges: React.FC<GoalsAndChallengesProps> = ({ userGoals, onSt
                   <div className="mt-3 pt-3 border-t border-green-500/20">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-green-100/70">Today's check-in:</span>
-                      <button 
-                        onClick={() => handleGoalAction(goal.id, 'checkin')}
-                        className="bg-green-500 hover:bg-green-600 px-3 py-1 rounded text-xs font-medium"
+                      <button
+                        onClick={() => handleDailyCheckin(goal)}
+                        className={`bg-green-500 hover:bg-green-600 px-3 py-1 rounded text-xs font-medium ${checkinState[goal.id] === getToday() ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={checkinState[goal.id] === getToday()}
                       >
                         Complete Daily Check-in
                       </button>

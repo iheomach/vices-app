@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Brain, TrendingUp, AlertTriangle, Lightbulb, BarChart3, Zap, Shield, Target } from 'lucide-react';
 import { safeArray } from '../utils/safeArray'; // Adjust the import path as necessary
+import { Goal } from '../types/goals';
+import { JournalEntry } from '../types/tracking';
+
 interface Insight {
   type: string;
   title: string;
@@ -22,11 +25,14 @@ interface AIInsightsProps {
   insights: Insight[];
   personalizedRecommendations: Recommendation[];
   onRequestAnalysis: (timeframe: string) => Promise<void>;
+  userGoals: Goal[];
+  journalEntries: JournalEntry[];
 }
 
-const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommendations, onRequestAnalysis }) => {
+const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommendations, onRequestAnalysis, userGoals, journalEntries }) => {
   const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState('week');
+  const [aiAnalysis, setAiAnalysis] = useState<string>('');
 
   const timeframes = [
     { id: 'week', name: '7 Days', icon: '📅' },
@@ -67,24 +73,37 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommend
     }
   };
 
-  const generateNewInsights = async () => {
+  const fetchAIAnalysis = async (timeframe: string) => {
     setIsGeneratingInsights(true);
     try {
-      await onRequestAnalysis(selectedTimeframe);
+      const prompt = `You are an AI wellness coach. Summarize the user's substance use, mood, and sleep patterns for the past ${timeframe === 'week' ? '7 days' : timeframe === 'month' ? '30 days' : timeframe === 'quarter' ? '3 months' : 'all available time'}. Highlight key patterns, improvements, and actionable insights.`;
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/openai/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          goals: userGoals,
+          journal: journalEntries,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch AI analysis');
+      const data = await response.json();
+
+      setAiAnalysis(typeof data.result === 'string' ? data.result : JSON.stringify(data.result));
     } catch (error) {
-      console.error('Error generating insights:', error);
+      setAiAnalysis('Failed to generate AI analysis.');
+      console.error(error);
     } finally {
       setIsGeneratingInsights(false);
     }
   };
 
-  const mockAIAnalysis = `Based on your ${selectedTimeframe === 'week' ? '7-day' : selectedTimeframe === 'month' ? '30-day' : 'long-term'} data, you've shown excellent consistency in mindful consumption. Your sleep quality has improved by 18% since starting the optimization challenge. Consider maintaining your current weekend routine as it correlates with your best mood scores.
-
-Key patterns identified:
-• Cannabis use on weekends correlates with 23% better social satisfaction
-• Alcohol consumption after 8 PM reduces sleep quality by 15%
-• Your optimal dosing appears to be 5-7.5mg THC for desired effects
-• Hydration levels significantly impact next-day mood (+2.1 points average)`;
+  // Fetch on mount and when timeframe changes
+  useEffect(() => {
+    fetchAIAnalysis(selectedTimeframe);
+  }, [selectedTimeframe]);
 
   return (
     <div className="space-y-6">
@@ -96,7 +115,7 @@ Key patterns identified:
             <span>AI Analysis Controls</span>
           </h3>
           <button
-            onClick={generateNewInsights}
+            onClick={() => fetchAIAnalysis(selectedTimeframe)}
             disabled={isGeneratingInsights}
             className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 px-4 py-2 rounded-lg text-sm font-medium transition-all"
           >
@@ -111,7 +130,7 @@ Key patterns identified:
           </button>
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 overflow-x-auto whitespace-nowrap flex-nowrap w-full">
           {timeframes.map((timeframe) => (
             <button
               key={timeframe.id}
@@ -137,7 +156,7 @@ Key patterns identified:
         </h3>
         <div className="bg-gradient-to-r from-[#7CC379]/20 to-[#7CC379]/10 rounded-lg p-4 mb-4">
           <div className="whitespace-pre-line text-sm leading-relaxed">
-            {mockAIAnalysis}
+            {isGeneratingInsights ? 'Analyzing...' : aiAnalysis}
           </div>
         </div>
         

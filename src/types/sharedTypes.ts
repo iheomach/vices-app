@@ -27,6 +27,7 @@ export interface Challenge {
   features: string[];
   benefits: string[];
   color: string;
+  target_value: number;
 }
 
 // Component Props

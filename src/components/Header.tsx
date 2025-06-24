@@ -37,9 +37,7 @@ const Header: React.FC<HeaderProps> = ({
       </div>
       
       <div className="flex items-center space-x-4">
-        {showUserInfo && user && (
-        <span className="text-[#7CC379]">Welcome, {user.first_name || 'User'}!</span>
-        )}
+
         
         {additionalButtons}
         

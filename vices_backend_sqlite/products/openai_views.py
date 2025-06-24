@@ -21,9 +21,18 @@ def generate_recommendations(request):
         # Parse request body
         data = json.loads(request.body)
         prompt = data.get('prompt')
+        goals = data.get('goals', [])
+        journal = data.get('journal', [])
         
         if not prompt:
             return JsonResponse({'error': 'Prompt is required'}, status=400)
+        
+        # Format goals and journal as a summary string
+        goals_summary = f"User Goals: {json.dumps(goals, indent=2)}" if goals else ""
+        journal_summary = f"User Journal Entries: {json.dumps(journal, indent=2)}" if journal else ""
+        
+        # Append the summaries to the prompt
+        full_prompt = f"{prompt}\n\n{goals_summary}\n\n{journal_summary}"
         
         # Call OpenAI API
         completion = client.chat.completions.create(
@@ -31,7 +40,7 @@ def generate_recommendations(request):
             messages=[
                 {
                     "role": "user",
-                    "content": prompt
+                    "content": full_prompt
                 }
             ],
             temperature=0.7,
