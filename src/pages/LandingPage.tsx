@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Brain, BarChart3, Target, Calendar, MapPin, Shield, Users, Zap } from 'lucide-react';
-import ss1 from '../images/ss1.png';
-import ss2 from '../images/ss2.png';
-import ss3 from '../images/ss3.png';
-
-
+import journal from '../images/journal.png';
+import ai_insight from '../images/ai_insight.png';
+import challenges from '../images/challenges.png';
 interface TrackingStatus {
   message: string;
   type: 'loading' | 'success' | 'error' | 'idle';
@@ -44,8 +42,19 @@ const VicesLandingPage: React.FC = () => {
     }
   };
 
+  const handleViewDemo = () => {
+    setTrackingStatus({
+      message: "🧠 Analyzing consumption patterns...",
+      type: 'loading'
+    });
 
-
+    setTimeout(() => {
+      setTrackingStatus({
+        message: "✅ Generated 5 personalized insights and 3 optimization recommendations!",
+        type: 'success'
+      });
+    }, 2000);
+  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -213,7 +222,7 @@ const VicesLandingPage: React.FC = () => {
             {isAuthenticated ? (
               <>
                 <button 
-                  onClick={() => navigate('/user-dashboard')}
+                  onClick={() => navigate('/profile')}
                   className="bg-gradient-to-r from-[#7CC379] to-[#66A363] px-4 py-2 rounded-full text-white font-medium hover:shadow-lg hover:shadow-[#7CC379]/25 transition-all duration-300"
                 >
                   Profile
@@ -291,38 +300,28 @@ const VicesLandingPage: React.FC = () => {
           
           {/* Feature Buttons */}
           <div 
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8"
             style={{ transform: `translateY(${scrollY * 0.5}px)` }}
           >
             <button 
               onClick={() => scrollToSection('journey-tracker')}
               className="bg-gradient-to-r from-[#7CC379] to-[#5a9556] text-white px-6 py-4 rounded-xl text-lg font-semibold hover:shadow-xl hover:shadow-[#7CC379]/40 hover:-translate-y-2 transition-all flex items-center justify-center space-x-2"
             >
-              <Brain className="w-5 h-5" />
-              <span>Journey Tracker</span>
+              <span>AI-powered Journey Tracker</span>
             </button>
             
             <button 
               onClick={() => scrollToSection('wellness')}
               className="border-2 border-[#7CC379] text-white px-6 py-4 rounded-xl text-lg font-semibold hover:bg-[#7CC379]/20 transition-all flex items-center justify-center space-x-2"
             >
-              <Target className="w-5 h-5" />
               <span>Wellness Tools</span>
             </button>
 
-            <button 
-              onClick={() => scrollToSection('features')}
-              className="bg-[#1B272C]/80 border border-[#7CC379]/30 text-white px-6 py-4 rounded-xl text-lg font-semibold hover:bg-[#1B272C] transition-all flex items-center justify-center space-x-2"
-            >
-              <Brain className="w-5 h-5" />
-              <span>AI Features</span>
-            </button>
 
             <button 
-
+              onClick={handleViewDemo}
               className="bg-gradient-to-r from-gray-600 to-gray-500 text-white px-6 py-4 rounded-xl text-lg font-semibold hover:from-gray-500 hover:to-gray-400 hover:shadow-xl hover:shadow-[#7CC379]/40 hover:-translate-y-2 transition-all flex items-center justify-center space-x-2"
             >
-              <BarChart3 className="w-5 h-5" />
               <span>View Demo</span>
             </button>
           </div>
@@ -416,9 +415,9 @@ const VicesLandingPage: React.FC = () => {
             </p>
           </div>
           
-          <div className="flex flex-col justify-center gap-8 max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-center items-start md:items-center gap-8 max-w-6xl mx-auto">
             {/* Daily Journal Feature */}
-            <div className="flex flex-col items-center w-[1024px] mx-auto">
+            <div className="flex flex-col items-center">
               <div className="bg-gradient-to-r from-black/40 to-black/20 backdrop-blur-sm border border-[#7CC379]/20 rounded-xl p-6 w-full">
                 <div className="flex items-center space-x-4 mb-4">
                   <Calendar className="w-6 h-6 text-[#7CC379]" />
@@ -429,12 +428,12 @@ const VicesLandingPage: React.FC = () => {
                 </p>
               </div>
               {/* Screenshot placeholder */}
-              <div className="w-full aspect-[16/10] flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 overflow-hidden">
-                <img src={ss1} alt="Daily Journal Screenshot" className="w-full h-full object-contain" />
+              <div className="h-54 max-w-xs flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 mx-auto">
+                <img src={journal} alt="Daily Journal Screenshot" className="h-full w-auto object-contain" />
               </div>
             </div>
             {/* AI Insights Feature */}
-            <div className="flex flex-col items-center w-[1024px] mx-auto">
+            <div className="flex flex-col items-center">
               <div className="bg-gradient-to-r from-black/40 to-black/20 backdrop-blur-sm border border-[#7CC379]/20 rounded-xl p-6 w-full">
                 <div className="flex items-center space-x-4 mb-4">
                   <Brain className="w-6 h-6 text-[#7CC379]" />
@@ -445,12 +444,12 @@ const VicesLandingPage: React.FC = () => {
                 </p>
               </div>
               {/* Screenshot placeholder */}
-              <div className="w-full aspect-[16/10] flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 overflow-hidden">
-              <img src={ss2} alt="Daily Journal Screenshot" className="w-full h-full object-contain" />
+              <div className="h-54 max-w-xs flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 mx-auto">
+                <img src={ai_insight} alt="AI Insights Screenshot" className="h-full w-auto object-contain" />
               </div>
             </div>
             {/* Goals & Challenges Feature */}
-            <div className="flex flex-col items-center w-[1024px] mx-auto">
+            <div className="flex flex-col items-center">
               <div className="bg-gradient-to-r from-black/40 to-black/20 backdrop-blur-sm border border-[#7CC379]/20 rounded-xl p-6 w-full">
                 <div className="flex items-center space-x-4 mb-4">
                   <Target className="w-6 h-6 text-[#7CC379]" />
@@ -461,8 +460,8 @@ const VicesLandingPage: React.FC = () => {
                 </p>
               </div>
               {/* Screenshot placeholder */}
-              <div className="w-full aspect-[16/10] flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 overflow-hidden">
-              <img src={ss3} alt="Daily Journal Screenshot" className="w-full h-full object-contain" />
+              <div className="h-54 max-w-xs flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 mx-auto">
+                <img src={challenges} alt="Goals & Challenges Screenshot" className="h-full w-auto object-contain" />
               </div>
             </div>
           </div>
@@ -526,44 +525,72 @@ const VicesLandingPage: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mx-auto justify-center">
-            <div className="relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 border-gray-500 rounded-2xl p-8 flex flex-col">
-              <div className="text-center flex-1 flex flex-col">
-                <h3 className="text-2xl font-bold mb-4 mt-2 text-white">Free</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-[#7CC379]">$0</span>
-                  <span className="text-green-100/60">/forever</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                name: "Free",
+                price: "$0",
+                period: "forever",
+                features: [
+                  "Basic journal tracking (5 entries/month)",
+                  "Simple mood & sleep logging",
+                  "Basic dashboard overview",
+                  "One active goal at a time",
+                  "Weekly AI insights",
+                  "Community access"
+                ],
+                color: "border-gray-500",
+                buttonColor: "bg-gray-600 hover:bg-gray-700"
+              },
+              {
+                name: "Premium",
+                price: "$9.99",
+                period: "per month",
+                features: [
+                  "Unlimited journal entries",
+                  "Advanced tracking & analytics",
+                  "Multiple goals & challenges",
+                  "Detailed AI insights & recommendations",
+                  "Data export (CSV/PDF)",
+                  "Priority support",
+                  "Ad-free experience"
+                ],
+                color: "border-[#7CC379] ring-2 ring-[#7CC379]/50",
+                buttonColor: "bg-gradient-to-r from-[#7CC379] to-[#5a9556]",
+                popular: true
+              }
+            ].map((plan, index) => (
+              <div key={index} className={`relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 ${plan.color} rounded-2xl p-8 flex flex-col`}>
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-[#7CC379] text-white px-4 py-1 rounded-full text-sm font-semibold">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+                
+                <div className="text-center flex-1 flex flex-col">
+                  <h3 className="text-2xl font-bold mb-2 text-white">{plan.name}</h3>
+                  <div className="mb-6">
+                    <span className="text-4xl font-bold text-[#7CC379]">{plan.price}</span>
+                    <span className="text-green-100/60">/{plan.period}</span>
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-center space-x-3">
+                        <span className="text-[#7CC379]">✓</span>
+                        <span className="text-green-100/70">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <button className={`w-full py-3 rounded-lg font-semibold transition-all mt-auto ${plan.buttonColor}`}>
+                    {plan.name === "Mindful" ? "Start Free" : "Begin Wellness Journey"}
+                  </button>
                 </div>
-                <ul className="space-y-4 mb-10 flex-1 px-2">
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Basic journal tracking (5 entries/month)</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Simple mood & sleep logging</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Basic dashboard overview</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">One active goal at a time</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Weekly AI insights</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Community access</span></li>
-                </ul>
-                <button className="w-full py-3 rounded-lg font-semibold transition-all mt-6 bg-gray-600 hover:bg-gray-700">Start Free</button>
               </div>
-            </div>
-            <div className="relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 border-[#7CC379] ring-2 ring-[#7CC379]/50 rounded-2xl p-8 flex flex-col">
-              <div className="text-center flex-1 flex flex-col">
-                <h3 className="text-2xl font-bold mb-4 mt-2 text-white">Premium</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-[#7CC379]">$9.99</span>
-                  <span className="text-green-100/60">/per month</span>
-                </div>
-                <ul className="space-y-4 mb-10 flex-1 px-2">
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Unlimited journal entries</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Advanced tracking & analytics</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Multiple goals & challenges</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Detailed AI insights & recommendations</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Data export (CSV/PDF)</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Priority support</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Ad-free experience</span></li>
-                </ul>
-                <button className="w-full py-3 rounded-lg font-semibold transition-all mt-6 bg-gradient-to-r from-[#7CC379] to-[#5a9556]">Begin Wellness Journey</button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

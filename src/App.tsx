@@ -1,6 +1,7 @@
 // src/App.tsx
 import React from 'react';
 import LandingPage from './pages/LandingPage';
+import ProfilePage from './pages/UserProfile';
 import UserSignupPage from './pages/UserSignupPage';
 import LoginPage from './pages/LoginPage';
 import UserDashboard from './pages/UserDashboard';
@@ -35,9 +36,9 @@ function App() {
                 <UserDashboard />
               </ProtectedRoute>
             } />
-            <Route path="/product/:id" element={
+            <Route path="/profile" element={
               <ProtectedRoute>
-                <ProductDetailsPage />
+                <ProfilePage />
               </ProtectedRoute>
             } />
           </Routes>

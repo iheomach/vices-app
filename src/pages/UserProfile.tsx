@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
 import { User, Mail, Lock, Bell, Shield, Download, Trash2, Edit3, Save, X } from 'lucide-react';
+import { GoalsApi } from '../services/api/goalsApi';
+import { TrackingApi } from '../services/api/trackingApi';
 
 interface UserProfile {
   firstName: string;
@@ -24,6 +26,9 @@ interface UserProfile {
     anonymousMode: boolean;
   };
 }
+
+const goalsApi = new GoalsApi();
+const trackingApi = new TrackingApi();
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -91,10 +96,38 @@ const ProfilePage: React.FC = () => {
     }));
   };
 
+  const handleExportData = async () => {
+    try {
+      // Only fetch goals and journal entries
+      const [journalRes, goalsRes]: [any, any] = await Promise.all([
+        trackingApi.getJournalEntries(),
+        goalsApi.getGoals()
+      ]);
+      // Format the data
+      const exportData = {
+        journalEntries: Array.isArray(journalRes) ? journalRes : journalRes?.results ?? [],
+        goals: Array.isArray(goalsRes) ? goalsRes : goalsRes?.results ?? [],
+      };
+      // Create a blob and trigger download
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vices_export.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Export error:', err);
+      alert('Failed to export data. Please try again.');
+    }
+  };
+
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'privacy', label: 'Privacy', icon: Shield },
+    // { id: 'notifications', label: 'Notifications', icon: Bell },
+    // { id: 'privacy', label: 'Privacy', icon: Shield },
     { id: 'account', label: 'Account', icon: Lock }
   ];
 
@@ -114,21 +147,23 @@ const ProfilePage: React.FC = () => {
 
           {/* Tab Navigation */}
           <div className="bg-black/20 backdrop-blur-sm rounded-xl p-2 mb-8 border border-[#7CC379]/20">
-            <div className="flex space-x-2">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-[#7CC379]/20 text-[#7CC379] border border-[#7CC379]/30'
-                      : 'text-gray-300 hover:text-[#7CC379] hover:bg-[#7CC379]/10'
-                  }`}
-                >
-                  <tab.icon className="w-4 h-4" />
-                  <span className="font-medium">{tab.label}</span>
-                </button>
-              ))}
+            <div className="flex justify-center">
+              <div className="inline-flex space-x-2 overflow-x-auto">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all ${
+                      activeTab === tab.id
+                        ? 'bg-[#7CC379]/20 text-[#7CC379] border border-[#7CC379]/30'
+                        : 'text-gray-300 hover:text-[#7CC379] hover:bg-[#7CC379]/10'
+                    }`}
+                  >
+                    <tab.icon className="w-4 h-4" />
+                    <span className="font-medium">{tab.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -242,7 +277,7 @@ const ProfilePage: React.FC = () => {
                       </div>
                     )}
                   </div>
-
+{/* 
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Wellness Goals</label>
                     <div className="space-y-2">
@@ -277,14 +312,14 @@ const ProfilePage: React.FC = () => {
                         </label>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
           )}
 
           {/* Notifications Tab */}
-          {activeTab === 'notifications' && (
+          {/* {activeTab === 'notifications' && (
             <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
               <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Notification Preferences</h2>
               
@@ -318,10 +353,10 @@ const ProfilePage: React.FC = () => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Privacy Tab */}
-          {activeTab === 'privacy' && (
+          {/* {activeTab === 'privacy' && (
             <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
               <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Privacy Settings</h2>
               
@@ -354,7 +389,7 @@ const ProfilePage: React.FC = () => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Account Tab */}
           {activeTab === 'account' && (
@@ -369,7 +404,10 @@ const ProfilePage: React.FC = () => {
                       <h3 className="font-medium text-white">Export Your Data</h3>
                       <p className="text-sm text-gray-300">Download all your wellness data and insights</p>
                     </div>
-                    <button className="flex items-center space-x-2 bg-[#7CC379]/20 text-[#7CC379] px-4 py-2 rounded-lg hover:bg-[#7CC379]/30 transition-all">
+                    <button
+                      onClick={handleExportData}
+                      className="flex items-center space-x-2 bg-[#7CC379]/20 text-[#7CC379] px-4 py-2 rounded-lg hover:bg-[#7CC379]/30 transition-all"
+                    >
                       <Download className="w-4 h-4" />
                       <span>Export</span>
                     </button>
