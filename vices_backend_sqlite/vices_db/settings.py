@@ -140,8 +140,8 @@ REST_FRAMEWORK = {
 
 # CORS settings (for development)
 CORS_ALLOWED_ORIGINS = [
-    "https://yourdomain.com",
-    "https://www.yourdomain.com",
+    "https://vices-app.vercel.app",
+    "http://localhost:3000",  # (optional, for local development)
 ]
 
 CORS_ALLOW_CREDENTIALS = True
