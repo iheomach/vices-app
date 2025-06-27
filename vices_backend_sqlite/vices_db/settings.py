@@ -11,10 +11,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-SECRET_KEY = 'django-insecure-ni%z2@xb84%6n^y*r=6@786hfy3z56)qrs1rnnvz6a$9l=updv'
+ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -140,13 +140,13 @@ REST_FRAMEWORK = {
 
 # CORS settings (for development)
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "https://yourdomain.com",
+    "https://www.yourdomain.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_ALL_ORIGINS = True  # Only use this in development!
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
