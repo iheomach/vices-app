@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Brain, BarChart3, Target, Calendar, MapPin, Shield, Users, Zap } from 'lucide-react';
+import { Brain, BarChart3, Target, Calendar, MapPin, Shield, Users, Zap, Menu, X } from 'lucide-react';
 import journal from '../images/journal.png';
 import ai_insight from '../images/ai_insight.png';
 import challenges from '../images/challenges.png';
-interface TrackingStatus {
-  message: string;
-  type: 'loading' | 'success' | 'error' | 'idle';
-}
+import VideoModal from '../components/VideoModal';
 
 const VicesLandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
-  const [trackingStatus, setTrackingStatus] = useState<TrackingStatus>({
-    message: '',
-    type: 'idle'
-  });
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,17 +38,11 @@ const VicesLandingPage: React.FC = () => {
   };
 
   const handleViewDemo = () => {
-    setTrackingStatus({
-      message: "🧠 Analyzing consumption patterns...",
-      type: 'loading'
-    });
+    setIsVideoModalOpen(true);
+  };
 
-    setTimeout(() => {
-      setTrackingStatus({
-        message: "✅ Generated 5 personalized insights and 3 optimization recommendations!",
-        type: 'success'
-      });
-    }, 2000);
+  const closeVideoModal = () => {
+    setIsVideoModalOpen(false);
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -61,6 +50,12 @@ const VicesLandingPage: React.FC = () => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    setIsMobileMenuOpen(false); // Close mobile menu when navigating
+  };
+
+  const handleMobileNavigation = (action: () => void) => {
+    action();
+    setIsMobileMenuOpen(false); // Close mobile menu after navigation
   };
 
   // Mock phone screens for parallax effect
@@ -183,21 +178,14 @@ const VicesLandingPage: React.FC = () => {
             VICES
           </div>
           
+          {/* Desktop Navigation */}
           <ul className="hidden md:flex space-x-8">
             <li>
               <button 
-                onClick={() => navigate('/features')}
+                onClick={() => scrollToSection('features')}
                 className="text-white hover:text-[#7CC379] font-medium transition-colors"
               >
                 Features
-              </button>
-            </li>
-            <li>
-              <button 
-                onClick={() => navigate('/pricing')}
-                className="text-white hover:text-[#7CC379] font-medium transition-colors"
-              >
-                Pricing
               </button>
             </li>
             <li>
@@ -210,28 +198,48 @@ const VicesLandingPage: React.FC = () => {
             </li>
             <li>
               <button 
-                onClick={() => scrollToSection('wellness')}
+                onClick={() => scrollToSection('pricing')}
                 className="text-white hover:text-[#7CC379] font-medium transition-colors"
               >
-                Wellness
+                Pricing
               </button>
+            </li>
+            <li>
+              <button 
+                onClick={() => navigate('/about')}
+                className="text-white hover:text-[#7CC379] font-medium transition-colors"
+              >
+                About Us
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => navigate('/contact')}
+                className="text-white hover:text-[#7CC379] font-medium transition-colors"
+              >
+                Contact
+              </button>
+              </li>
+            {isAuthenticated && (
+              <li>
+                <button
+                  onClick={() => navigate('/user-dashboard')}
+                  className="text-white hover:text-[#7CC379] font-medium transition-colors"
+                >
+                  Your Dashboard
+                </button>
+              </li>
+            )}
+            <li>
             </li>
           </ul>
           
-          <div className="flex items-center space-x-4">
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <>
                 <button 
-                  onClick={() => navigate('/profile')}
-                  className="bg-gradient-to-r from-[#7CC379] to-[#66A363] px-4 py-2 rounded-full text-white font-medium hover:shadow-lg hover:shadow-[#7CC379]/25 transition-all duration-300"
-                >
-                  Profile
-                </button>
-                <button
-                  onClick={() => {
-                    logout();
-                    navigate('/');
-                  }}
+                  onClick={() => logout()}
                   className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 rounded-full text-white font-medium hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300"
                 >
                   Sign Out
@@ -254,7 +262,103 @@ const VicesLandingPage: React.FC = () => {
               </>
             )}
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden text-white hover:text-[#7CC379] transition-colors"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
         </nav>
+
+        {/* Mobile Menu */}
+        <div className={`md:hidden transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen 
+            ? 'max-h-screen opacity-100' 
+            : 'max-h-0 opacity-0 overflow-hidden'
+        }`}>
+          <div className="bg-[#1B272C]/95 backdrop-blur-xl border-t border-[#7CC379]/20 px-6 py-4">
+            <div className="space-y-4">
+              {/* Navigation Links */}
+              <div className="space-y-3">
+                <button 
+                  onClick={() => handleMobileNavigation(() => scrollToSection('features'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  Features
+                </button>
+                <button 
+                  onClick={() => handleMobileNavigation(() => scrollToSection('journey-tracker'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  Journey Tracker
+                </button>
+                <button 
+                  onClick={() => handleMobileNavigation(() => scrollToSection('pricing'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  Pricing
+                </button>
+                <button 
+                  onClick={() => handleMobileNavigation(() => navigate('/about'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  About Us
+                </button>
+                
+                <button
+                  onClick={() => handleMobileNavigation(() => navigate('/contact'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  Contact
+                </button>
+                {isAuthenticated && (
+                  <button
+                    onClick={() => handleMobileNavigation(() => navigate('/user-dashboard'))}
+                    className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                  >
+                    Your Dashboard
+                  </button>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-[#7CC379]/20 pt-4"></div>
+
+              {/* Auth Buttons */}
+              <div className="space-y-3">
+                {isAuthenticated ? (
+                  <button 
+                    onClick={() => handleMobileNavigation(() => logout())}
+                    className="w-full bg-gradient-to-r from-red-500 to-red-600 px-4 py-3 rounded-full text-white font-medium hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300"
+                  >
+                    Sign Out
+                  </button>
+                ) : (
+                  <>
+                    <button 
+                      onClick={() => handleMobileNavigation(() => navigate('/login'))}
+                      className="w-full text-white hover:text-[#7CC379] font-medium transition-colors py-3 border border-[#7CC379]/30 rounded-full hover:bg-[#7CC379]/10"
+                    >
+                      Login
+                    </button>
+                    <button
+                      onClick={() => handleMobileNavigation(() => navigate('/usersignup'))}
+                      className="w-full bg-gradient-to-r from-[#7CC379] to-[#66A363] px-4 py-3 rounded-full text-white font-medium hover:shadow-lg hover:shadow-[#7CC379]/25 transition-all duration-300"
+                    >
+                      Sign Up Free
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </header>
 
       {/* Hero Section with Parallax */}
@@ -325,16 +429,6 @@ const VicesLandingPage: React.FC = () => {
               <span>View Demo</span>
             </button>
           </div>
-
-          {trackingStatus.message && (
-            <div className={`text-lg mt-4 p-4 rounded-xl ${
-              trackingStatus.type === 'success' ? 'text-[#7CC379] bg-[#7CC379]/10 border border-[#7CC379]/20' : 
-              trackingStatus.type === 'error' ? 'text-red-400 bg-red-400/10 border border-red-400/20' : 
-              'text-yellow-400 bg-yellow-400/10 border border-yellow-400/20'
-            }`}>
-              {trackingStatus.message}
-            </div>
-          )}
         </div>
       </section>
 
@@ -551,7 +645,7 @@ const VicesLandingPage: React.FC = () => {
                   "Advanced tracking & analytics",
                   "Multiple goals & challenges",
                   "Detailed AI insights & recommendations",
-                  "Data export (CSV/PDF)",
+                  "Data export (json)",
                   "Priority support",
                   "Ad-free experience"
                 ],
@@ -608,15 +702,12 @@ const VicesLandingPage: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
-              onClick={handleStartJourney}
+              onClick={() => navigate('/login')}
               className="bg-gradient-to-r from-[#7CC379] to-[#5a9556] text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl hover:shadow-[#7CC379]/40 hover:-translate-y-2 transition-all"
             >
               🌱 Start Your Wellness Journey
             </button>
-            
-            <button className="border-2 border-[#7CC379] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#7CC379]/20 transition-all">
-              Learn About Our Approach
-            </button>
+
           </div>
         </div>
       </section>
@@ -624,48 +715,24 @@ const VicesLandingPage: React.FC = () => {
       {/* Footer */}
       <footer className="bg-black/50 py-12 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="flex flex-col items-center text-center gap-8 mb-8">
             <div>
               <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#7CC379] to-[#5a9556] bg-clip-text text-transparent">
                 VICES
               </h3>
-              <p className="text-green-100/60 leading-relaxed">
+              <p className="text-green-100/60 leading-relaxed max-w-xl mx-auto">
                 The AI-powered wellness platform for mindful cannabis and alcohol consumption. 
                 Build healthier habits through intelligent tracking and personalized insights.
               </p>
             </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-[#7CC379]">Wellness Features</h3>
-              <div className="space-y-2">
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Journey Tracker</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">AI Insights</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Health Monitoring</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Community Support</a></p>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-[#7CC379]">Resources</h3>
-              <div className="space-y-2">
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Wellness Blog</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Research</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Safety Guidelines</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Support Center</a></p>
-              </div>
-            </div>
-            
             <div>
               <h3 className="text-lg font-semibold mb-4 text-[#7CC379]">Legal</h3>
               <div className="space-y-2">
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Privacy Policy</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Terms of Service</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">HIPAA Compliance</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Age Verification</a></p>
+                <p><button onClick={() => navigate('/privacy-policy')} className="text-green-100/60 hover:text-[#7CC379] transition-colors">Privacy Policy</button></p>
+                <p><button onClick={() => navigate('/terms-of-service')} className="text-green-100/60 hover:text-[#7CC379] transition-colors">Terms of Service</button></p>
               </div>
             </div>
           </div>
-          
           <div className="border-t border-[#7CC379]/20 pt-6 text-center">
             <p className="text-green-100/50">
               &copy; 2025 VICES. All rights reserved. Promoting mindful consumption and wellness through technology.
@@ -673,6 +740,15 @@ const VicesLandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Video Modal */}
+      {isVideoModalOpen && (
+        <VideoModal 
+          isOpen={isVideoModalOpen} 
+          onClose={closeVideoModal} 
+          videoId="GGO-7hSqI4Q"
+        />
+      )}
     </div>
   );
 };

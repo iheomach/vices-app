@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator
+from django.conf import settings
+from django.utils import timezone
+import datetime
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
@@ -26,6 +29,7 @@ class User(AbstractUser):
     preferred_categories = models.JSONField(default=list, blank=True, help_text="e.g., ['cannabis', 'wine', 'beer', 'spirits']")
     tolerance_level = models.CharField(max_length=20, blank=True, help_text="Overall tolerance level")
     favorite_effects = models.JSONField(default=list, blank=True, help_text="e.g., ['relaxation', 'creativity', 'social']")
+    account_tier = models.CharField(max_length=20, blank=True, help_text="e.g., 'free', 'premium'")
     consumption_goals = models.JSONField(default=list, blank=True, help_text="e.g., ['sleep', 'pain_relief', 'celebration']")
 
     # Account info
@@ -46,3 +50,17 @@ class User(AbstractUser):
     
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
+
+class PasswordResetCode(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_expired(self):
+        # Code expires after 10 minutes
+        return self.created_at < timezone.now() - datetime.timedelta(minutes=10)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.code} ({'used' if self.is_used else 'active'})"
+

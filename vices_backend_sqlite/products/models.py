@@ -4,7 +4,6 @@ from django.db import models
 class Product(models.Model):
     # Core product info
     name = models.CharField(max_length=200)
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     category = models.CharField(choices=[('cannabis', 'Cannabis'), ('alcohol', 'Alcohol')])
     product_type = models.CharField(max_length=50)  # flower, edible, wine, beer
     

@@ -1,4 +1,4 @@
-# vices_backend_sqlite/products/openai_views.py
+# vices_db/products/openai_views.py
 import json
 import os
 from django.http import JsonResponse

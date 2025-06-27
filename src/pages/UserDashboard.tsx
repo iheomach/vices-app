@@ -57,7 +57,7 @@ interface WellnessMetric {
 }
 
 const UserDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   
   const [activeMood, setActiveMood] = useState<string>('relaxed');
@@ -67,6 +67,10 @@ const UserDashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<{ firstName: string; lastName: string }>({
+    firstName: user?.first_name || '',
+    lastName: user?.last_name || '',
+  });
 
   const trackingApi = new TrackingApi();
   const goalsApi = new GoalsApi();
@@ -110,6 +114,24 @@ const UserDashboard: React.FC = () => {
 
     fetchData();
   }, []);
+
+  // Fetch latest user profile from backend on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!token) return;
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile/`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProfile({ firstName: data.first_name, lastName: data.last_name });
+      }
+    };
+    fetchProfile();
+  }, [token]);
 
   // Calculate real metrics from database
   const calculateGoalProgress = (): number => {
@@ -409,7 +431,7 @@ Focus on harm reduction, wellness optimization, and evidence-based recommendatio
               {/* Welcome Section */}
               <div className="text-center mb-12">
                 <h1 className="text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r from-[#7CC379] to-[#7CC379]/80 bg-clip-text text-transparent">
-                  {getTimeBasedGreeting()}, {user?.first_name || 'Friend'}!
+                  {getTimeBasedGreeting()}, {profile.firstName || 'Friend'}!
                 </h1>
                 <p className="text-gray-300 text-lg">
                   Your AI wellness coach is ready to optimize your experience

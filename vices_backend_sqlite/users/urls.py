@@ -1,17 +1,11 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from . import views
 
-# Create router for viewsets
-router = DefaultRouter()
-router.register(r'profiles', views.UserProfileViewSet, basename='users')
-
 urlpatterns = [
-    # Include viewset routes
-    path('', include(router.urls)),
-    
-    # Add your custom register endpoint
     path('register/', views.register_user, name='register_user'),
-
     path('login/', views.login_user, name='login_user'),
+    path('profile/', views.UserProfileViewSet.as_view({'put': 'update_profile', 'get': 'profile'}), name='user-profile'),
+    path('request-password-change/', views.request_password_change, name='request_password_change'),
+    path('confirm-password-change/', views.confirm_password_change, name='confirm_password_change'),
+    path('public-request-password-reset/', views.public_request_password_reset, name='public_request_password_reset'),
 ]

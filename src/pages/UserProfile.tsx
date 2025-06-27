@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
 import { User, Mail, Lock, Bell, Shield, Download, Trash2, Edit3, Save, X } from 'lucide-react';
 import { GoalsApi } from '../services/api/goalsApi';
 import { TrackingApi } from '../services/api/trackingApi';
+import { requestPasswordChange, confirmPasswordChange } from '../services/api/apiUtils';
 
 interface UserProfile {
   firstName: string;
@@ -31,7 +32,7 @@ const goalsApi = new GoalsApi();
 const trackingApi = new TrackingApi();
 
 const ProfilePage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUser, token } = useAuth();
   
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
@@ -67,10 +68,49 @@ const ProfilePage: React.FC = () => {
 
   const substanceOptions = ['Cannabis', 'Alcohol', 'Both', 'Wellness', 'None'];
 
-  const handleSave = () => {
-    setProfile(editedProfile);
-    setIsEditing(false);
-    // Here you would typically save to your backend
+  // Password change state
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [code, setCode] = useState('');
+  const [passwordStep, setPasswordStep] = useState<'idle' | 'codeSent' | 'success'>('idle');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+
+  // Fetch latest profile from backend on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!token) return;
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile/`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProfile((prev) => ({
+          ...prev,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          email: data.email,
+          // ...add other fields as needed
+        }));
+      }
+    };
+    fetchProfile();
+  }, [token]);
+
+  const handleSave = async () => {
+    try {
+      // Update backend with new name
+      await updateUser({ first_name: editedProfile.firstName, last_name: editedProfile.lastName });
+      setProfile(editedProfile);
+      setIsEditing(false);
+    } catch (err) {
+      alert('Failed to update name. Please try again.');
+    }
   };
 
   const handleCancel = () => {
@@ -124,6 +164,61 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleSendCode = async () => {
+    setPasswordError(null);
+    setPasswordSuccess(null);
+    setPasswordLoading(true);
+    if (!token) {
+      setPasswordError('You must be logged in to change your password.');
+      setPasswordLoading(false);
+      return;
+    }
+    try {
+      await requestPasswordChange(token);
+      setPasswordStep('codeSent');
+      setPasswordSuccess('Verification code sent to your email.');
+    } catch (err: any) {
+      setPasswordError(err.message || 'Failed to send code.');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const handleConfirmChange = async () => {
+    setPasswordError(null);
+    setPasswordSuccess(null);
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+    if (!code || !newPassword) {
+      setPasswordError('Please enter the code and new password.');
+      return;
+    }
+    if (!token) {
+      setPasswordError('You must be logged in to change your password.');
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      await confirmPasswordChange(token, code, newPassword);
+      setPasswordStep('success');
+      setPasswordSuccess('Password changed successfully.');
+      setTimeout(() => {
+        setShowPasswordForm(false);
+        setPasswordStep('idle');
+        setNewPassword('');
+        setConfirmPassword('');
+        setCode('');
+        setPasswordSuccess(null);
+      }, 2000);
+    } catch (err: any) {
+      setPasswordError(err.message || 'Failed to change password.');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
     // { id: 'notifications', label: 'Notifications', icon: Bell },
@@ -172,7 +267,7 @@ const ProfilePage: React.FC = () => {
             <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-[#7CC379]">Personal Information</h2>
-                {!isEditing ? (
+                {!isEditing && (
                   <button
                     onClick={() => setIsEditing(true)}
                     className="flex items-center space-x-2 bg-[#7CC379]/20 text-[#7CC379] px-4 py-2 rounded-lg hover:bg-[#7CC379]/30 transition-all"
@@ -180,25 +275,27 @@ const ProfilePage: React.FC = () => {
                     <Edit3 className="w-4 h-4" />
                     <span>Edit</span>
                   </button>
-                ) : (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={handleSave}
-                      className="flex items-center space-x-2 bg-gradient-to-r from-[#7CC379] to-[#5a9556] px-4 py-2 rounded-lg hover:shadow-lg transition-all"
-                    >
-                      <Save className="w-4 h-4" />
-                      <span>Save</span>
-                    </button>
-                    <button
-                      onClick={handleCancel}
-                      className="flex items-center space-x-2 bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-700 transition-all"
-                    >
-                      <X className="w-4 h-4" />
-                      <span>Cancel</span>
-                    </button>
-                  </div>
                 )}
               </div>
+              {/* Save/Cancel buttons inside the box, right-aligned */}
+              {isEditing && (
+                <div className="flex justify-end space-x-2 mb-6">
+                  <button
+                    onClick={handleSave}
+                    className="flex items-center space-x-2 bg-gradient-to-r from-[#7CC379] to-[#5a9556] px-4 py-2 rounded-lg hover:shadow-lg transition-all"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Save</span>
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="flex items-center space-x-2 bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-700 transition-all"
+                  >
+                    <X className="w-4 h-4" />
+                    <span>Cancel</span>
+                  </button>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Basic Info */}
@@ -277,119 +374,10 @@ const ProfilePage: React.FC = () => {
                       </div>
                     )}
                   </div>
-{/* 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Wellness Goals</label>
-                    <div className="space-y-2">
-                      {wellnessGoalOptions.map((goal) => (
-                        <label key={goal} className="flex items-center space-x-3">
-                          <input
-                            type="checkbox"
-                            checked={isEditing ? editedProfile.wellnessGoals.includes(goal) : profile.wellnessGoals.includes(goal)}
-                            onChange={() => isEditing && toggleWellnessGoal(goal)}
-                            disabled={!isEditing}
-                            className="w-4 h-4 text-[#7CC379] bg-black/30 border-[#7CC379]/20 rounded focus:ring-[#7CC379]"
-                          />
-                          <span className="text-gray-200">{goal}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Substances</label>
-                    <div className="space-y-2">
-                      {substanceOptions.map((substance) => (
-                        <label key={substance} className="flex items-center space-x-3">
-                          <input
-                            type="checkbox"
-                            checked={isEditing ? editedProfile.substances.includes(substance) : profile.substances.includes(substance)}
-                            onChange={() => isEditing && toggleSubstance(substance)}
-                            disabled={!isEditing}
-                            className="w-4 h-4 text-[#7CC379] bg-black/30 border-[#7CC379]/20 rounded focus:ring-[#7CC379]"
-                          />
-                          <span className="text-gray-200">{substance}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div> */}
                 </div>
               </div>
             </div>
           )}
-
-          {/* Notifications Tab */}
-          {/* {activeTab === 'notifications' && (
-            <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
-              <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Notification Preferences</h2>
-              
-              <div className="space-y-6">
-                {Object.entries(profile.notifications).map(([key, value]) => (
-                  <div key={key} className="flex items-center justify-between p-4 bg-black/30 rounded-lg">
-                    <div>
-                      <h3 className="font-medium text-white capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </h3>
-                      <p className="text-sm text-gray-300">
-                        {key === 'dailyReminders' && 'Get reminded to log your daily entries'}
-                        {key === 'weeklyReports' && 'Receive weekly wellness analytics reports'}
-                        {key === 'communityUpdates' && 'Stay updated on community challenges and events'}
-                        {key === 'safetyAlerts' && 'Important safety and health alerts'}
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={value}
-                        onChange={(e) => setProfile(prev => ({
-                          ...prev,
-                          notifications: { ...prev.notifications, [key]: e.target.checked }
-                        }))}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7CC379]"></div>
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )} */}
-
-          {/* Privacy Tab */}
-          {/* {activeTab === 'privacy' && (
-            <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
-              <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Privacy Settings</h2>
-              
-              <div className="space-y-6">
-                {Object.entries(profile.privacy).map(([key, value]) => (
-                  <div key={key} className="flex items-center justify-between p-4 bg-black/30 rounded-lg">
-                    <div>
-                      <h3 className="font-medium text-white capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </h3>
-                      <p className="text-sm text-gray-300">
-                        {key === 'profileVisible' && 'Allow other users to see your profile'}
-                        {key === 'shareProgress' && 'Share your progress in community challenges'}
-                        {key === 'anonymousMode' && 'Use anonymous mode for community interactions'}
-                      </p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={value}
-                        onChange={(e) => setProfile(prev => ({
-                          ...prev,
-                          privacy: { ...prev.privacy, [key]: e.target.checked }
-                        }))}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7CC379]"></div>
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )} */}
 
           {/* Account Tab */}
           {activeTab === 'account' && (
@@ -413,6 +401,92 @@ const ProfilePage: React.FC = () => {
                     </button>
                   </div>
                 </div>
+              </div>
+
+              {/* Change Password */}
+              <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
+                <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Change Password</h2>
+                {!showPasswordForm ? (
+                  <button
+                    onClick={() => setShowPasswordForm(true)}
+                    className="flex items-center space-x-2 bg-[#7CC379]/20 text-[#7CC379] px-4 py-2 rounded-lg hover:bg-[#7CC379]/30 transition-all"
+                  >
+                    <Lock className="w-4 h-4" />
+                    <span>Change Password</span>
+                  </button>
+                ) : (
+                  <div className="space-y-4 max-w-md">
+                    {passwordStep === 'success' ? (
+                      <div className="text-green-400 font-semibold">{passwordSuccess}</div>
+                    ) : (
+                      <>
+                        {passwordStep === 'idle' && (
+                          <button
+                            onClick={handleSendCode}
+                            className="bg-[#7CC379] text-white px-4 py-2 rounded-lg hover:bg-[#5a9556] transition-all"
+                            disabled={passwordLoading}
+                          >
+                            {passwordLoading ? 'Sending...' : 'Send Verification Code'}
+                          </button>
+                        )}
+                        {passwordStep === 'codeSent' && (
+                          <>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">Verification Code</label>
+                              <input
+                                type="text"
+                                value={code}
+                                onChange={e => setCode(e.target.value)}
+                                className="w-full bg-black/30 border border-[#7CC379]/20 rounded-lg px-4 py-3 text-white focus:border-[#7CC379] focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+                              <input
+                                type="password"
+                                value={newPassword}
+                                onChange={e => setNewPassword(e.target.value)}
+                                className="w-full bg-black/30 border border-[#7CC379]/20 rounded-lg px-4 py-3 text-white focus:border-[#7CC379] focus:outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">Confirm New Password</label>
+                              <input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={e => setConfirmPassword(e.target.value)}
+                                className="w-full bg-black/30 border border-[#7CC379]/20 rounded-lg px-4 py-3 text-white focus:border-[#7CC379] focus:outline-none"
+                              />
+                            </div>
+                            <button
+                              onClick={handleConfirmChange}
+                              className="bg-[#7CC379] text-white px-4 py-2 rounded-lg hover:bg-[#5a9556] transition-all mt-2"
+                              disabled={passwordLoading}
+                            >
+                              {passwordLoading ? 'Changing...' : 'Confirm Change'}
+                            </button>
+                          </>
+                        )}
+                        {passwordError && <div className="text-red-400 font-semibold mt-2">{passwordError}</div>}
+                        {passwordSuccess && <div className="text-green-400 font-semibold mt-2">{passwordSuccess}</div>}
+                        <button
+                          onClick={() => {
+                            setShowPasswordForm(false);
+                            setPasswordStep('idle');
+                            setNewPassword('');
+                            setConfirmPassword('');
+                            setCode('');
+                            setPasswordError(null);
+                            setPasswordSuccess(null);
+                          }}
+                          className="text-gray-400 hover:text-white text-sm mt-4"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Danger Zone */}

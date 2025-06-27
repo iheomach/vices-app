@@ -62,3 +62,30 @@ export class BaseApi {
     return response;
   }
 }
+
+export async function requestPasswordChange(token: string) {
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/users/request-password-change/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Token ${token}`,
+    },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to request password change');
+  return data;
+}
+
+export async function confirmPasswordChange(token: string, code: string, newPassword: string) {
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/users/confirm-password-change/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Token ${token}`,
+    },
+    body: JSON.stringify({ code, new_password: newPassword }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to change password');
+  return data;
+}

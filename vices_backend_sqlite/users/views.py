@@ -9,6 +9,11 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token  # ✅ ADD THIS IMPORT
+from .models import PasswordResetCode
+from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
+import random
 import json
 
 User = get_user_model()
@@ -24,8 +29,32 @@ class UserProfileViewSet(viewsets.ModelViewSet):
                 'id': request.user.id,
                 'username': request.user.username,
                 'email': request.user.email,
+                'first_name': request.user.first_name,
+                'last_name': request.user.last_name,
             })
         return Response({'error': 'Not authenticated'}, status=401)
+
+    @action(detail=False, methods=['put'], url_path='profile')
+    def update_profile(self, request):
+        # Update current user's first and last name
+        if not request.user.is_authenticated:
+            return Response({'error': 'Not authenticated'}, status=401)
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        if not first_name and not last_name:
+            return Response({'error': 'No data to update'}, status=400)
+        if first_name:
+            request.user.first_name = first_name
+        if last_name:
+            request.user.last_name = last_name
+        request.user.save()
+        return Response({
+            'id': request.user.id,
+            'username': request.user.username,
+            'email': request.user.email,
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+        })
 
 @csrf_exempt
 @api_view(['POST'])
@@ -138,3 +167,78 @@ def login_user(request):
             {'error': str(e)}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+@csrf_exempt
+@api_view(['POST'])
+def request_password_change(request):
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'Not authenticated'}, status=401)
+    # Invalidate old codes
+    PasswordResetCode.objects.filter(user=user, is_used=False).update(is_used=True)
+    code = str(random.randint(100000, 999999))
+    PasswordResetCode.objects.create(user=user, code=code)
+    send_mail(
+        'Your Password Change Code',
+        f'Your code is: {code}',
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+    )
+    return Response({'message': 'Verification code sent to your email.'})
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def confirm_password_change(request):
+    code = request.data.get('code')
+    new_password = request.data.get('new_password')
+    email = request.data.get('email')
+
+    if email:
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid email or code.'}, status=400)
+    else:
+        user = request.user
+        if not user.is_authenticated:
+            return Response({'error': 'Not authenticated.'}, status=401)
+
+    try:
+        reset_code = PasswordResetCode.objects.get(user=user, code=code, is_used=False)
+    except PasswordResetCode.DoesNotExist:
+        return Response({'error': 'Invalid or expired code.'}, status=400)
+    if reset_code.is_expired():
+        reset_code.is_used = True
+        reset_code.save()
+        return Response({'error': 'Code expired.'}, status=400)
+    user.set_password(new_password)
+    user.save()
+    reset_code.is_used = True
+    reset_code.save()
+    return Response({'message': 'Password changed successfully.'})
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def public_request_password_reset(request):
+    email = request.data.get('email')
+    if not email:
+        return Response({'error': 'Email is required.'}, status=400)
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        # For security, don't reveal if user exists
+        return Response({'message': 'If this email exists, a code has been sent.'})
+    # Invalidate old codes
+    PasswordResetCode.objects.filter(user=user, is_used=False).update(is_used=True)
+    code = str(random.randint(100000, 999999))
+    PasswordResetCode.objects.create(user=user, code=code)
+    send_mail(
+        'Your Password Reset Code',
+        f'Your code is: {code}',
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+    )
+    return Response({'message': 'If this email exists, a code has been sent.'})

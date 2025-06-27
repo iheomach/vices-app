@@ -17,6 +17,7 @@ export interface User {
   preferred_categories: string[];
   tolerance_level: string;
   favorite_effects: string[];
+  account_tier: string;
   consumption_goals: string[];
 
   // Preferences

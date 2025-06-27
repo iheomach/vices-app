@@ -443,11 +443,11 @@ const ViceJourneyTracker: React.FC = () => {
 
           <div className="mt-8 max-w-xl mx-auto bg-[#101C1F] rounded-2xl p-6 border border-[#7CC379]/20 flex justify-center items-center">
             <div className="flex-1 text-center">
-              <div className="text-3xl font-bold text-[#7CC379]">7</div>
+              <div className="text-3xl font-bold text-[#7CC379]">{userData.journalEntries?.length || 0}</div>
               <div className="text-base text-gray-300">Journal Entries</div>
             </div>
             <div className="flex-1 text-center">
-              <div className="text-3xl font-bold text-[#7CC379]">3</div>
+              <div className="text-3xl font-bold text-[#7CC379]">{userData.goals?.filter(goal => goal.status === 'active').length || 0}</div>
               <div className="text-base text-gray-300">Active Goals</div>
             </div>
           </div>

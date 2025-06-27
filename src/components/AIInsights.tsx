@@ -265,9 +265,42 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommend
   const fetchAIAnalysis = async (timeframe: string) => {
     setIsGeneratingInsights(true);
     try {
-      const prompt = `Based on my substance use, mood, and sleep data for the past ${timeframe === 'week' ? '7 days' : timeframe === 'month' ? '30 days' : timeframe === 'quarter' ? '3 months' : 'all available time'}, provide me with a personalized wellness analysis. 
+      // Check if there's actual journal data to analyze
+      const hasJournalData = journalEntries && journalEntries.length > 0;
+      const hasGoals = userGoals && userGoals.length > 0;
+      
+      let prompt;
+      
+      if (!hasJournalData) {
+        // No journal data available
+        prompt = `I notice you haven't entered any journal data yet for tracking your substance use, mood, or sleep patterns. 
 
-Focus on key patterns in my behavior, any improvements I've made, and give me 2-3 specific, actionable recommendations to help me better understand and manage my relationship with substances.`;
+Since I don't have any actual usage data to analyze, I can't provide personalized insights about your patterns or behaviors. However, I can help you get started:
+
+1. Consider logging your first journal entry to begin tracking your wellness journey
+2. Your active goals show you're interested in mindful consumption - great start!
+3. Regular tracking will help identify patterns and provide more meaningful insights
+
+Would you like to start by logging your first entry, or do you have any questions about how to use the tracking features effectively?`;
+      } else {
+        // Has journal data - provide actual analysis
+        const timeDescription = timeframe === 'week' ? '7 days' : 
+                               timeframe === 'month' ? '30 days' : 
+                               timeframe === 'quarter' ? '3 months' : 
+                               'all available time';
+        
+        prompt = `Based on your actual journal entries for the past ${timeDescription}, provide me with a personalized wellness analysis. 
+
+IMPORTANT: Only analyze the data you actually have. If there's limited data, acknowledge this and focus on what can be learned from the available entries.
+
+Focus on:
+- Key patterns in your actual recorded behavior (only if you have multiple entries)
+- Any improvements or changes you've documented
+- 2-3 specific, actionable recommendations based on your real data
+- If you have very few entries, suggest how more regular tracking could help
+
+Be honest about data limitations and don't make assumptions about patterns that aren't supported by your actual journal entries.`;
+      }
 
       const response = await fetch(`${process.env.REACT_APP_API_URL}/openai/`, {
         method: 'POST',
@@ -276,6 +309,12 @@ Focus on key patterns in my behavior, any improvements I've made, and give me 2-
           prompt,
           goals: userGoals,
           journal: journalEntries,
+          dataContext: {
+            hasJournalData,
+            journalEntryCount: journalEntries?.length || 0,
+            hasGoals,
+            goalCount: userGoals?.length || 0
+          }
         }),
       });
 
