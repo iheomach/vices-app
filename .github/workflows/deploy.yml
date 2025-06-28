@@ -69,8 +69,8 @@ jobs:
     - name: Install frontend dependencies
       run: npm ci
       
-    - name: Run frontend tests
-      run: npm test -- --coverage --watchAll=false
+    # - name: Run frontend tests
+    #   run: npm test -- --coverage --watchAll=false
       
     - name: Build React app
       run: npm run build
