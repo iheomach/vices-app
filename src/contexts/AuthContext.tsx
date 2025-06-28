@@ -21,6 +21,7 @@ interface User {
   preferred_categories: string[];
   tolerance_level: string;
   favorite_effects: string[];
+  account_tier: string;
   consumption_goals: string[];
 
   // Preferences
@@ -214,6 +215,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             preferred_categories: [],
             tolerance_level: '',
             favorite_effects: [],
+            account_tier: 'free',
             consumption_goals: [],
             receive_deal_notifications: true,
             is_verified: true, // Assuming the user is verified upon successful login
@@ -265,11 +267,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     
     try {
-      const response = await fetch('/api/users/profile/', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile/`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Token ${token}`
         },
         body: JSON.stringify(userData)
       });

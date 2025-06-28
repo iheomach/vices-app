@@ -2,6 +2,7 @@ PRODUCT REQUIREMENTS DOCUMENT (PRD)
 VICES - AI-Powered Wellness & Substance Use Tracking App
 Version 1.0
 Date: December 2024
+Updated: June 2025
 
 ================================================================================
 1. EXECUTIVE SUMMARY
@@ -38,16 +39,17 @@ Many individuals lack awareness of their substance use patterns and their impact
 3.1 User Authentication & Onboarding
 - User registration with email/password
 - Multi-step signup process with wellness preferences
-- User profile management
-- Secure authentication with JWT tokens
-- Password reset functionality
+- User profile management with name editing
+- Secure authentication with Django REST Framework tokens
+- Password reset functionality with 2FA via email
+- Data export functionality (goals and journal entries)
 
 3.2 Dashboard
 - Overview of user's wellness journey
-- Key metrics display (mindful days, sleep quality, mood trends)
-- Active challenges and goals summary
+- Key metrics display (journal entries, active goals, mindful days)
 - Recent journal entries preview
 - Quick action buttons for common tasks
+- Progress visualization for active goals
 
 3.3 Daily Journal
 - Substance use tracking (type, amount, time, context)
@@ -57,12 +59,12 @@ Many individuals lack awareness of their substance use patterns and their impact
 - Data visualization for patterns
 
 3.4 Goals & Challenges
-- Pre-defined wellness challenges
-- Custom goal creation
+- Pre-defined wellness challenges (7-Day T-Break, Dry January)
+- Custom goal creation and management
 - Progress tracking with visual indicators
 - Goal status management (active, paused, completed)
 - Daily check-in functionality
-- Challenge completion rewards
+- Challenge completion tracking
 
 3.5 AI Insights
 - Personalized analysis of user data
@@ -72,36 +74,22 @@ Many individuals lack awareness of their substance use patterns and their impact
 - Wellness coaching insights
 - Correlation analysis between substances and effects
 
-3.6 Vendor Integration
-- Local vendor discovery
-- Product reviews and ratings
-- Vendor categorization
-- Location-based search
-- User-generated content
-
-3.7 Data Management
+3.6 Data Management
 - Secure data storage and encryption
-- Data export functionality
+- Data export functionality (JSON format)
 - Privacy controls
-- GDPR compliance
-- Data backup and recovery
+- User profile management
+- Password change with 2FA
 
-3.8 AI Capabilities by Plan
+3.7 AI Capabilities by Plan
 
 - Free Plan:
   - Basic AI insights: Users receive weekly summary insights based on their last 5 journal entries, with simple pattern recognition and basic wellness tips. Insights are limited in depth and frequency (e.g., one summary per week). Dashboard shows only high-level trends and basic stats. No personalized recommendations or advanced analytics.
   - AIInsights: Only basic summaries and trend detection (e.g., mood/sleep averages, mindful days, one active goal tracked). No correlation analysis or deep pattern recognition.
-  - VendorsPreview: No AI-powered vendor recommendations or analysis.
 
 - Premium Plan:
   - Advanced AI insights: Users receive detailed, personalized analysis of all their journal data, including mood, sleep, and effect correlations, trend identification, and actionable recommendations. Insights are available on demand and for multiple timeframes (week, month, quarter, all-time). Dashboard includes advanced analytics, custom goal tracking, and multiple active goals. AIInsights provides correlation analysis, goal adherence, and improvement tracking. Data export and ad-free experience included.
   - AIInsights: Full access to personalized, context-aware recommendations, advanced pattern recognition, and time-based analysis. Users can generate new insights on demand and receive actionable advice.
-  - VendorsPreview: AI-powered vendor and product recommendations based on user patterns and preferences, including local discovery and review analysis.
-
-- Pro Plan (if present):
-  - All Premium features, plus enterprise-level AI analytics, integration with biometric devices, and healthcare provider dashboards. AI can generate custom wellness reports, support for family/enterprise plans, and provide predictive analytics for advanced users or clinics.
-  - AIInsights: Access to the most advanced AI features, including predictive modeling, virtual coaching, and deep data mining.
-  - VendorsPreview: Enterprise-level vendor analytics, market insights, and integration with external health data sources.
 
 ================================================================================
 4. TECHNICAL REQUIREMENTS
@@ -138,6 +126,7 @@ Many individuals lack awareness of their substance use patterns and their impact
 - SQL injection prevention
 - XSS protection
 - CSRF protection
+- 2FA for password changes
 
 4.5 Performance Requirements
 - Page load time < 3 seconds
@@ -197,13 +186,7 @@ Many individuals lack awareness of their substance use patterns and their impact
 - Performance monitoring data
 - Error tracking and debugging
 
-6.3 External Data
-- Vendor information and reviews
-- Substance information database
-- Wellness resources and educational content
-- Community-generated insights
-
-6.4 Data Privacy
+6.3 Data Privacy
 - User consent management
 - Data anonymization options
 - Right to data deletion
@@ -216,24 +199,17 @@ Many individuals lack awareness of their substance use patterns and their impact
 
 7.1 Third-Party Services
 - OpenAI API for AI insights
-- Email service provider for notifications
+- Email service provider for notifications and 2FA
 - Analytics platform for user behavior tracking
-- Payment processor for premium features
+- Payment processor for premium features (Stripe integration ready)
 - Cloud storage for data backup
 
 7.2 External APIs
-- Geolocation services for vendor discovery
+- Geolocation services for future vendor discovery
 - Weather API for mood correlation
 - Health tracking device integration
 - Social media sharing capabilities
 - Calendar integration for reminders
-
-7.3 Mobile Platform Integration
-- iOS and Android app development
-- Push notification services
-- App store optimization
-- Deep linking support
-- Offline synchronization
 
 ================================================================================
 8. MONETIZATION STRATEGY
@@ -295,12 +271,14 @@ Many individuals lack awareness of their substance use patterns and their impact
 10. LAUNCH STRATEGY
 ================================================================================
 
-10.1 MVP Features (Phase 1)
+10.1 MVP Features (Phase 1) - COMPLETED
 - User authentication and profiles
 - Basic journaling functionality
 - Simple goal tracking
 - Core dashboard
 - Essential AI insights
+- Password change with 2FA
+- Data export functionality
 
 10.2 Beta Testing
 - Closed beta with 100-500 users
@@ -389,6 +367,71 @@ The success of Vices will depend on:
 With proper execution and continuous iteration based on user feedback, Vices has the potential to become a leading platform in the digital wellness space, helping millions of users make informed decisions about their substance use and overall wellness.
 
 ================================================================================
+CURRENT IMPLEMENTATION STATUS (June 2025)
+================================================================================
+
+IMPLEMENTED FEATURES:
+✅ User Authentication & Registration
+- Multi-step signup process
+- Login/logout functionality
+- Password change with 2FA via email
+- User profile management (name editing)
+- Protected routes
+
+✅ Core Dashboard
+- Overview of wellness journey
+- Key metrics display
+- Recent journal entries preview
+- Quick action buttons
+
+✅ Daily Journal
+- Substance use tracking
+- Mood and sleep quality logging
+- Journal entry creation and editing
+- Historical entry viewing
+
+✅ Goals & Challenges
+- Pre-defined wellness challenges (7-Day T-Break, Dry January)
+- Custom goal creation and management
+- Progress tracking with visual indicators
+- Goal status management (active, paused, completed)
+- Daily check-in functionality
+
+✅ AI Insights
+- Personalized analysis of user data
+- Pattern recognition and trend identification
+- Actionable recommendations
+- Time-based analysis (week, month, quarter, all-time)
+
+✅ Data Management
+- Data export functionality (JSON format)
+- User profile management
+- Secure data storage
+
+✅ Backend API
+- Django REST Framework
+- User authentication and authorization
+- Goals and journal entries CRUD operations
+- AI integration with OpenAI
+- Email functionality for 2FA
+
+✅ Frontend Architecture
+- React with TypeScript
+- Tailwind CSS for styling
+- Component-based architecture
+- React Context for state management
+- Responsive design
+
+PLANNED BUT NOT YET IMPLEMENTED:
+❌ Vendor Integration
+❌ Community Features
+❌ Advanced Analytics Dashboard
+❌ Mobile App
+❌ Payment Processing (Stripe integration ready but not active)
+❌ Push Notifications
+❌ Offline Capability
+
+================================================================================
 RECENT UI/UX IMPROVEMENTS (June 2025)
 ================================================================================
 
@@ -397,6 +440,7 @@ RECENT UI/UX IMPROVEMENTS (June 2025)
 - Every active goal card displays pause, play, complete, and daily check-in buttons, as well as a progress bar, ensuring all actions are always accessible.
 - Dashboard/stat cards (e.g., Journal Entries, Active Goals) are now centered and visually balanced, with improved spacing and padding for clarity.
 - Journal entry cards and feature cards have improved spacing, padding, and layout for a less squished, more readable experience.
+- Password change functionality with 2FA via email has been implemented for enhanced security.
 
 These changes enhance usability, make the interface more intuitive, and ensure the app is visually appealing and easy to use on both desktop and mobile devices.
 

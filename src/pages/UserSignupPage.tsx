@@ -1,5 +1,7 @@
 // pages/UserSignupPage.tsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import SignupHeader from '../components/SignupHeader';
 import SignupStep1 from '../components/SignupStep1';
 import SignupStep2 from '../components/SignupStep2';
@@ -7,6 +9,9 @@ import SignupFooter from '../components/SignupFooter';
 import { FormData, FormErrors } from '../types/signup';
 
 const UserSignupPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+  
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -97,34 +102,25 @@ const UserSignupPage: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/register/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          password: formData.password,
-          location: formData.location,
-          receiveDeals: formData.receiveDeals
-        })
+      // Use the AuthContext register function
+      await register({
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        phone: formData.phone,
+        date_of_birth: new Date().toISOString(), // You might want to add a date picker for this
+        city: formData.location
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('Account created successfully:', data);
-        alert('Account created successfully! Welcome to Vices!');
-        // window.location.href = '/login';
-      } else {
-        setErrors({ submit: data.error || 'Failed to create account. Please try again.' });
-      }
+      console.log('Account created and logged in successfully!');
+      
+      // Redirect to User Dashboard
+      navigate('/user-dashboard');
+      
     } catch (error) {
       console.error('Signup error:', error);
-      setErrors({ submit: 'Network error. Please check your connection and try again.' });
+      setErrors({ submit: error instanceof Error ? error.message : 'Failed to create account. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }

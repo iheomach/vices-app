@@ -1,26 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Brain, BarChart3, Target, Calendar, MapPin, Shield, Users, Zap } from 'lucide-react';
-import ss1 from '../images/ss1.png';
-import ss2 from '../images/ss2.png';
-import ss3 from '../images/ss3.png';
-
-
-interface TrackingStatus {
-  message: string;
-  type: 'loading' | 'success' | 'error' | 'idle';
-}
+import { Brain, BarChart3, Target, Calendar, MapPin, Shield, Users, Zap, Menu, X } from 'lucide-react';
+import journal from '../images/journal.png';
+import ai_insight from '../images/ai_insight.png';
+import challenges from '../images/challenges.png';
+import VideoModal from '../components/VideoModal';
 
 const VicesLandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
-  const [trackingStatus, setTrackingStatus] = useState<TrackingStatus>({
-    message: '',
-    type: 'idle'
-  });
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,14 +37,25 @@ const VicesLandingPage: React.FC = () => {
     }
   };
 
+  const handleViewDemo = () => {
+    setIsVideoModalOpen(true);
+  };
 
-
+  const closeVideoModal = () => {
+    setIsVideoModalOpen(false);
+  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    setIsMobileMenuOpen(false); // Close mobile menu when navigating
+  };
+
+  const handleMobileNavigation = (action: () => void) => {
+    action();
+    setIsMobileMenuOpen(false); // Close mobile menu after navigation
   };
 
   // Mock phone screens for parallax effect
@@ -174,21 +178,14 @@ const VicesLandingPage: React.FC = () => {
             VICES
           </div>
           
+          {/* Desktop Navigation */}
           <ul className="hidden md:flex space-x-8">
             <li>
               <button 
-                onClick={() => navigate('/features')}
+                onClick={() => scrollToSection('features')}
                 className="text-white hover:text-[#7CC379] font-medium transition-colors"
               >
                 Features
-              </button>
-            </li>
-            <li>
-              <button 
-                onClick={() => navigate('/pricing')}
-                className="text-white hover:text-[#7CC379] font-medium transition-colors"
-              >
-                Pricing
               </button>
             </li>
             <li>
@@ -201,28 +198,48 @@ const VicesLandingPage: React.FC = () => {
             </li>
             <li>
               <button 
-                onClick={() => scrollToSection('wellness')}
+                onClick={() => scrollToSection('pricing')}
                 className="text-white hover:text-[#7CC379] font-medium transition-colors"
               >
-                Wellness
+                Pricing
               </button>
+            </li>
+            <li>
+              <button 
+                onClick={() => navigate('/about')}
+                className="text-white hover:text-[#7CC379] font-medium transition-colors"
+              >
+                About Us
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => navigate('/contact')}
+                className="text-white hover:text-[#7CC379] font-medium transition-colors"
+              >
+                Contact
+              </button>
+              </li>
+            {isAuthenticated && (
+              <li>
+                <button
+                  onClick={() => navigate('/user-dashboard')}
+                  className="text-white hover:text-[#7CC379] font-medium transition-colors"
+                >
+                  Your Dashboard
+                </button>
+              </li>
+            )}
+            <li>
             </li>
           </ul>
           
-          <div className="flex items-center space-x-4">
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <>
                 <button 
-                  onClick={() => navigate('/user-dashboard')}
-                  className="bg-gradient-to-r from-[#7CC379] to-[#66A363] px-4 py-2 rounded-full text-white font-medium hover:shadow-lg hover:shadow-[#7CC379]/25 transition-all duration-300"
-                >
-                  Profile
-                </button>
-                <button
-                  onClick={() => {
-                    logout();
-                    navigate('/');
-                  }}
+                  onClick={() => logout()}
                   className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 rounded-full text-white font-medium hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300"
                 >
                   Sign Out
@@ -245,7 +262,103 @@ const VicesLandingPage: React.FC = () => {
               </>
             )}
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden text-white hover:text-[#7CC379] transition-colors"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
         </nav>
+
+        {/* Mobile Menu */}
+        <div className={`md:hidden transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen 
+            ? 'max-h-screen opacity-100' 
+            : 'max-h-0 opacity-0 overflow-hidden'
+        }`}>
+          <div className="bg-[#1B272C]/95 backdrop-blur-xl border-t border-[#7CC379]/20 px-6 py-4">
+            <div className="space-y-4">
+              {/* Navigation Links */}
+              <div className="space-y-3">
+                <button 
+                  onClick={() => handleMobileNavigation(() => scrollToSection('features'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  Features
+                </button>
+                <button 
+                  onClick={() => handleMobileNavigation(() => scrollToSection('journey-tracker'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  Journey Tracker
+                </button>
+                <button 
+                  onClick={() => handleMobileNavigation(() => scrollToSection('pricing'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  Pricing
+                </button>
+                <button 
+                  onClick={() => handleMobileNavigation(() => navigate('/about'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  About Us
+                </button>
+                
+                <button
+                  onClick={() => handleMobileNavigation(() => navigate('/contact'))}
+                  className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                >
+                  Contact
+                </button>
+                {isAuthenticated && (
+                  <button
+                    onClick={() => handleMobileNavigation(() => navigate('/user-dashboard'))}
+                    className="block w-full text-left text-white hover:text-[#7CC379] font-medium transition-colors py-2"
+                  >
+                    Your Dashboard
+                  </button>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-[#7CC379]/20 pt-4"></div>
+
+              {/* Auth Buttons */}
+              <div className="space-y-3">
+                {isAuthenticated ? (
+                  <button 
+                    onClick={() => handleMobileNavigation(() => logout())}
+                    className="w-full bg-gradient-to-r from-red-500 to-red-600 px-4 py-3 rounded-full text-white font-medium hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300"
+                  >
+                    Sign Out
+                  </button>
+                ) : (
+                  <>
+                    <button 
+                      onClick={() => handleMobileNavigation(() => navigate('/login'))}
+                      className="w-full text-white hover:text-[#7CC379] font-medium transition-colors py-3 border border-[#7CC379]/30 rounded-full hover:bg-[#7CC379]/10"
+                    >
+                      Login
+                    </button>
+                    <button
+                      onClick={() => handleMobileNavigation(() => navigate('/usersignup'))}
+                      className="w-full bg-gradient-to-r from-[#7CC379] to-[#66A363] px-4 py-3 rounded-full text-white font-medium hover:shadow-lg hover:shadow-[#7CC379]/25 transition-all duration-300"
+                    >
+                      Sign Up Free
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </header>
 
       {/* Hero Section with Parallax */}
@@ -291,51 +404,31 @@ const VicesLandingPage: React.FC = () => {
           
           {/* Feature Buttons */}
           <div 
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8"
             style={{ transform: `translateY(${scrollY * 0.5}px)` }}
           >
             <button 
               onClick={() => scrollToSection('journey-tracker')}
               className="bg-gradient-to-r from-[#7CC379] to-[#5a9556] text-white px-6 py-4 rounded-xl text-lg font-semibold hover:shadow-xl hover:shadow-[#7CC379]/40 hover:-translate-y-2 transition-all flex items-center justify-center space-x-2"
             >
-              <Brain className="w-5 h-5" />
-              <span>Journey Tracker</span>
+              <span>AI-powered Journey Tracker</span>
             </button>
             
             <button 
               onClick={() => scrollToSection('wellness')}
               className="border-2 border-[#7CC379] text-white px-6 py-4 rounded-xl text-lg font-semibold hover:bg-[#7CC379]/20 transition-all flex items-center justify-center space-x-2"
             >
-              <Target className="w-5 h-5" />
               <span>Wellness Tools</span>
             </button>
 
-            <button 
-              onClick={() => scrollToSection('features')}
-              className="bg-[#1B272C]/80 border border-[#7CC379]/30 text-white px-6 py-4 rounded-xl text-lg font-semibold hover:bg-[#1B272C] transition-all flex items-center justify-center space-x-2"
-            >
-              <Brain className="w-5 h-5" />
-              <span>AI Features</span>
-            </button>
 
             <button 
-
+              onClick={handleViewDemo}
               className="bg-gradient-to-r from-gray-600 to-gray-500 text-white px-6 py-4 rounded-xl text-lg font-semibold hover:from-gray-500 hover:to-gray-400 hover:shadow-xl hover:shadow-[#7CC379]/40 hover:-translate-y-2 transition-all flex items-center justify-center space-x-2"
             >
-              <BarChart3 className="w-5 h-5" />
               <span>View Demo</span>
             </button>
           </div>
-
-          {trackingStatus.message && (
-            <div className={`text-lg mt-4 p-4 rounded-xl ${
-              trackingStatus.type === 'success' ? 'text-[#7CC379] bg-[#7CC379]/10 border border-[#7CC379]/20' : 
-              trackingStatus.type === 'error' ? 'text-red-400 bg-red-400/10 border border-red-400/20' : 
-              'text-yellow-400 bg-yellow-400/10 border border-yellow-400/20'
-            }`}>
-              {trackingStatus.message}
-            </div>
-          )}
         </div>
       </section>
 
@@ -416,9 +509,9 @@ const VicesLandingPage: React.FC = () => {
             </p>
           </div>
           
-          <div className="flex flex-col justify-center gap-8 max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-center items-start md:items-center gap-8 max-w-6xl mx-auto">
             {/* Daily Journal Feature */}
-            <div className="flex flex-col items-center w-[1024px] mx-auto">
+            <div className="flex flex-col items-center">
               <div className="bg-gradient-to-r from-black/40 to-black/20 backdrop-blur-sm border border-[#7CC379]/20 rounded-xl p-6 w-full">
                 <div className="flex items-center space-x-4 mb-4">
                   <Calendar className="w-6 h-6 text-[#7CC379]" />
@@ -429,12 +522,12 @@ const VicesLandingPage: React.FC = () => {
                 </p>
               </div>
               {/* Screenshot placeholder */}
-              <div className="w-full aspect-[16/10] flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 overflow-hidden">
-                <img src={ss1} alt="Daily Journal Screenshot" className="w-full h-full object-contain" />
+              <div className="h-54 max-w-xs flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 mx-auto">
+                <img src={journal} alt="Daily Journal Screenshot" className="h-full w-auto object-contain" />
               </div>
             </div>
             {/* AI Insights Feature */}
-            <div className="flex flex-col items-center w-[1024px] mx-auto">
+            <div className="flex flex-col items-center">
               <div className="bg-gradient-to-r from-black/40 to-black/20 backdrop-blur-sm border border-[#7CC379]/20 rounded-xl p-6 w-full">
                 <div className="flex items-center space-x-4 mb-4">
                   <Brain className="w-6 h-6 text-[#7CC379]" />
@@ -445,12 +538,12 @@ const VicesLandingPage: React.FC = () => {
                 </p>
               </div>
               {/* Screenshot placeholder */}
-              <div className="w-full aspect-[16/10] flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 overflow-hidden">
-              <img src={ss2} alt="Daily Journal Screenshot" className="w-full h-full object-contain" />
+              <div className="h-54 max-w-xs flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 mx-auto">
+                <img src={ai_insight} alt="AI Insights Screenshot" className="h-full w-auto object-contain" />
               </div>
             </div>
             {/* Goals & Challenges Feature */}
-            <div className="flex flex-col items-center w-[1024px] mx-auto">
+            <div className="flex flex-col items-center">
               <div className="bg-gradient-to-r from-black/40 to-black/20 backdrop-blur-sm border border-[#7CC379]/20 rounded-xl p-6 w-full">
                 <div className="flex items-center space-x-4 mb-4">
                   <Target className="w-6 h-6 text-[#7CC379]" />
@@ -461,8 +554,8 @@ const VicesLandingPage: React.FC = () => {
                 </p>
               </div>
               {/* Screenshot placeholder */}
-              <div className="w-full aspect-[16/10] flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 overflow-hidden">
-              <img src={ss3} alt="Daily Journal Screenshot" className="w-full h-full object-contain" />
+              <div className="h-54 max-w-xs flex items-center justify-center mt-4 bg-black/10 rounded-xl border border-dashed border-[#7CC379]/20 mx-auto">
+                <img src={challenges} alt="Goals & Challenges Screenshot" className="h-full w-auto object-contain" />
               </div>
             </div>
           </div>
@@ -526,44 +619,72 @@ const VicesLandingPage: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mx-auto justify-center">
-            <div className="relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 border-gray-500 rounded-2xl p-8 flex flex-col">
-              <div className="text-center flex-1 flex flex-col">
-                <h3 className="text-2xl font-bold mb-4 mt-2 text-white">Free</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-[#7CC379]">$0</span>
-                  <span className="text-green-100/60">/forever</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                name: "Free",
+                price: "$0",
+                period: "forever",
+                features: [
+                  "Basic journal tracking (5 entries/month)",
+                  "Simple mood & sleep logging",
+                  "Basic dashboard overview",
+                  "One active goal at a time",
+                  "Weekly AI insights",
+                  "Community access"
+                ],
+                color: "border-gray-500",
+                buttonColor: "bg-gray-600 hover:bg-gray-700"
+              },
+              {
+                name: "Premium",
+                price: "$9.99",
+                period: "per month",
+                features: [
+                  "Unlimited journal entries",
+                  "Advanced tracking & analytics",
+                  "Multiple goals & challenges",
+                  "Detailed AI insights & recommendations",
+                  "Data export (json)",
+                  "Priority support",
+                  "Ad-free experience"
+                ],
+                color: "border-[#7CC379] ring-2 ring-[#7CC379]/50",
+                buttonColor: "bg-gradient-to-r from-[#7CC379] to-[#5a9556]",
+                popular: true
+              }
+            ].map((plan, index) => (
+              <div key={index} className={`relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 ${plan.color} rounded-2xl p-8 flex flex-col`}>
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-[#7CC379] text-white px-4 py-1 rounded-full text-sm font-semibold">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+                
+                <div className="text-center flex-1 flex flex-col">
+                  <h3 className="text-2xl font-bold mb-2 text-white">{plan.name}</h3>
+                  <div className="mb-6">
+                    <span className="text-4xl font-bold text-[#7CC379]">{plan.price}</span>
+                    <span className="text-green-100/60">/{plan.period}</span>
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-center space-x-3">
+                        <span className="text-[#7CC379]">✓</span>
+                        <span className="text-green-100/70">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <button className={`w-full py-3 rounded-lg font-semibold transition-all mt-auto ${plan.buttonColor}`}>
+                    {plan.name === "Mindful" ? "Start Free" : "Begin Wellness Journey"}
+                  </button>
                 </div>
-                <ul className="space-y-4 mb-10 flex-1 px-2">
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Basic journal tracking (5 entries/month)</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Simple mood & sleep logging</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Basic dashboard overview</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">One active goal at a time</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Weekly AI insights</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Community access</span></li>
-                </ul>
-                <button className="w-full py-3 rounded-lg font-semibold transition-all mt-6 bg-gray-600 hover:bg-gray-700">Start Free</button>
               </div>
-            </div>
-            <div className="relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 border-[#7CC379] ring-2 ring-[#7CC379]/50 rounded-2xl p-8 flex flex-col">
-              <div className="text-center flex-1 flex flex-col">
-                <h3 className="text-2xl font-bold mb-4 mt-2 text-white">Premium</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-[#7CC379]">$9.99</span>
-                  <span className="text-green-100/60">/per month</span>
-                </div>
-                <ul className="space-y-4 mb-10 flex-1 px-2">
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Unlimited journal entries</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Advanced tracking & analytics</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Multiple goals & challenges</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Detailed AI insights & recommendations</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Data export (CSV/PDF)</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Priority support</span></li>
-                  <li className="flex items-start space-x-3 text-left"><span className="text-[#7CC379] mt-1">✓</span><span className="text-green-100/80 leading-relaxed">Ad-free experience</span></li>
-                </ul>
-                <button className="w-full py-3 rounded-lg font-semibold transition-all mt-6 bg-gradient-to-r from-[#7CC379] to-[#5a9556]">Begin Wellness Journey</button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -581,15 +702,12 @@ const VicesLandingPage: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
-              onClick={handleStartJourney}
+              onClick={() => navigate('/login')}
               className="bg-gradient-to-r from-[#7CC379] to-[#5a9556] text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl hover:shadow-[#7CC379]/40 hover:-translate-y-2 transition-all"
             >
               🌱 Start Your Wellness Journey
             </button>
-            
-            <button className="border-2 border-[#7CC379] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#7CC379]/20 transition-all">
-              Learn About Our Approach
-            </button>
+
           </div>
         </div>
       </section>
@@ -597,48 +715,24 @@ const VicesLandingPage: React.FC = () => {
       {/* Footer */}
       <footer className="bg-black/50 py-12 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="flex flex-col items-center text-center gap-8 mb-8">
             <div>
               <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#7CC379] to-[#5a9556] bg-clip-text text-transparent">
                 VICES
               </h3>
-              <p className="text-green-100/60 leading-relaxed">
+              <p className="text-green-100/60 leading-relaxed max-w-xl mx-auto">
                 The AI-powered wellness platform for mindful cannabis and alcohol consumption. 
                 Build healthier habits through intelligent tracking and personalized insights.
               </p>
             </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-[#7CC379]">Wellness Features</h3>
-              <div className="space-y-2">
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Journey Tracker</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">AI Insights</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Health Monitoring</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Community Support</a></p>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-[#7CC379]">Resources</h3>
-              <div className="space-y-2">
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Wellness Blog</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Research</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Safety Guidelines</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Support Center</a></p>
-              </div>
-            </div>
-            
             <div>
               <h3 className="text-lg font-semibold mb-4 text-[#7CC379]">Legal</h3>
               <div className="space-y-2">
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Privacy Policy</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Terms of Service</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">HIPAA Compliance</a></p>
-                <p><a href="#" className="text-green-100/60 hover:text-[#7CC379] transition-colors">Age Verification</a></p>
+                <p><button onClick={() => navigate('/privacy-policy')} className="text-green-100/60 hover:text-[#7CC379] transition-colors">Privacy Policy</button></p>
+                <p><button onClick={() => navigate('/terms-of-service')} className="text-green-100/60 hover:text-[#7CC379] transition-colors">Terms of Service</button></p>
               </div>
             </div>
           </div>
-          
           <div className="border-t border-[#7CC379]/20 pt-6 text-center">
             <p className="text-green-100/50">
               &copy; 2025 VICES. All rights reserved. Promoting mindful consumption and wellness through technology.
@@ -646,6 +740,15 @@ const VicesLandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Video Modal */}
+      {isVideoModalOpen && (
+        <VideoModal 
+          isOpen={isVideoModalOpen} 
+          onClose={closeVideoModal} 
+          videoId="GGO-7hSqI4Q"
+        />
+      )}
     </div>
   );
 };
