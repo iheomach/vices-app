@@ -8,12 +8,12 @@ export class TrackingApi extends BaseApi {
   }
 
   async getJournalEntries(): Promise<JournalEntry[]> {
-    const response = await this.fetchWithAuth('/tracking/journal/');
+    const response = await this.fetchWithAuth('/api/tracking/journal/');
     return response.json();
   }
 
   async createJournalEntry(entry: Omit<JournalEntry, 'id' | 'timestamp'>): Promise<JournalEntry> {
-    const response = await this.fetchWithAuth('/tracking/journal/', {
+    const response = await this.fetchWithAuth('/api/tracking/journal/', {
       method: 'POST',
       body: JSON.stringify(entry),
     });
@@ -21,7 +21,7 @@ export class TrackingApi extends BaseApi {
   }
 
   async updateJournalEntry(id: string, entry: Partial<JournalEntry>): Promise<JournalEntry> {
-    const response = await this.fetchWithAuth(`/tracking/journal/${id}/`, {
+    const response = await this.fetchWithAuth(`/api/tracking/journal/${id}/`, {
       method: 'PATCH',
       body: JSON.stringify(entry),
     });
@@ -29,7 +29,7 @@ export class TrackingApi extends BaseApi {
   }
 
   async deleteJournalEntry(id: string): Promise<void> {
-    await this.fetchWithAuth(`/tracking/journal/${id}/`, {
+    await this.fetchWithAuth(`/api/tracking/journal/${id}/`, {
       method: 'DELETE',
     });
   }
@@ -46,7 +46,7 @@ export class TrackingApi extends BaseApi {
 
   async getConsumptionByDate(startDate: string, endDate: string): Promise<JournalEntry[]> {
     const response = await this.fetchWithAuth(
-      `/tracking/journal/?start_date=${startDate}&end_date=${endDate}`
+      `/api/tracking/journal/?start_date=${startDate}&end_date=${endDate}`
     );
     return response.json();
   }
