@@ -98,11 +98,11 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommend
 
   // Calculate weekly usage distribution
   const calculateWeeklyUsageDistribution = (): number[] => {
-    console.log('🔍 Calculating weekly usage distribution...');
-    console.log('📊 Journal entries:', journalEntries?.length);
+    // console.log('🔍 Calculating weekly usage distribution...');
+    // console.log('📊 Journal entries:', journalEntries?.length);
     
     if (!journalEntries || journalEntries.length === 0) {
-      console.log('❌ No journal entries found');
+      // console.log('❌ No journal entries found');
       return [14, 14, 14, 14, 14, 15, 15]; // Even distribution as fallback
     }
     
@@ -116,22 +116,22 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommend
       dayCounts[adjustedDay]++;
     });
     
-    console.log('📅 Day counts:', dayCounts);
+    // console.log('📅 Day counts:', dayCounts);
     
     // Convert to percentages
     const percentages = dayCounts.map(count => Math.round((count / totalEntries) * 100));
-    console.log('📊 Weekly distribution percentages:', percentages);
+    // console.log('📊 Weekly distribution percentages:', percentages);
     
     return percentages;
   };
 
   // Calculate effects correlations
   const calculateEffectsCorrelations = (): Array<{label: string, correlation: number, color: string}> => {
-    console.log('🔍 Calculating effects correlations...');
-    console.log('📊 Journal entries:', journalEntries?.length);
+    // console.log('🔍 Calculating effects correlations...');
+    // console.log('📊 Journal entries:', journalEntries?.length);
     
     if (!journalEntries || journalEntries.length < 5) {
-      console.log('❌ Insufficient data for correlations');
+      // console.log('❌ Insufficient data for correlations');
       return [
         { label: "Add more journal entries", correlation: 0, color: "text-gray-400" },
         { label: "to see your patterns", correlation: 0, color: "text-gray-400" }
@@ -145,15 +145,15 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommend
       entry.substance && entry.substance !== 'none'
     );
     
-    console.log('🍃 Entries with substances:', entriesWithSubstances.length);
-    console.log('🍃 Substance types found:', Array.from(new Set(entriesWithSubstances.map(e => e.substance))));
+    // console.log('🍃 Entries with substances:', entriesWithSubstances.length);
+    // console.log('🍃 Substance types found:', Array.from(new Set(entriesWithSubstances.map(e => e.substance))));
     
     if (entriesWithSubstances.length > 0) {
       // Calculate correlation between cannabis use and relaxation (mood improvement)
       const cannabisEntries = entriesWithSubstances.filter(entry => 
         entry.substance === 'cannabis'
       );
-      console.log('🌿 Cannabis entries:', cannabisEntries.length);
+      // console.log('🌿 Cannabis entries:', cannabisEntries.length);
       
       if (cannabisEntries.length > 0) {
         const avgMood = cannabisEntries.reduce((sum, entry) => sum + (entry.mood || 0), 0) / cannabisEntries.length;
@@ -169,7 +169,7 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommend
       const alcoholEntries = entriesWithSubstances.filter(entry => 
         entry.substance === 'alcohol'
       );
-      console.log('🍺 Alcohol entries:', alcoholEntries.length);
+      // console.log('🍺 Alcohol entries:', alcoholEntries.length);
       
       if (alcoholEntries.length > 0) {
         const correlation = Math.round(70 + Math.random() * 20); // Placeholder - could analyze social context
@@ -191,8 +191,8 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommend
       return day >= 1 && day <= 5; // Monday to Friday
     });
     
-    console.log('📅 Weekend entries:', weekendEntries.length);
-    console.log('📅 Weekday entries:', weekdayEntries.length);
+    // console.log('📅 Weekend entries:', weekendEntries.length);
+    // console.log('📅 Weekday entries:', weekdayEntries.length);
     
     if (weekendEntries.length > 0 && weekdayEntries.length > 0) {
       const weekendAvgMood = weekendEntries.reduce((sum, entry) => sum + (entry.mood || 0), 0) / weekendEntries.length;
@@ -210,7 +210,7 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommend
       const hour = new Date(entry.timestamp).getHours();
       return hour >= 18 || hour <= 6; // 6 PM to 6 AM
     });
-    console.log('🌙 Evening entries:', eveningEntries.length);
+    // console.log('🌙 Evening entries:', eveningEntries.length);
     
     if (eveningEntries.length > 0) {
       const avgSleepQuality = eveningEntries.reduce((sum, entry) => sum + (entry.sleep_quality || 0), 0) / eveningEntries.length;
@@ -222,7 +222,7 @@ const AIInsights: React.FC<AIInsightsProps> = ({ insights, personalizedRecommend
       });
     }
     
-    console.log('📊 Final correlations:', correlations);
+    // console.log('📊 Final correlations:', correlations);
     
     return correlations.length > 0 ? correlations : [
       { label: "No patterns detected", correlation: 0, color: "text-gray-400" },

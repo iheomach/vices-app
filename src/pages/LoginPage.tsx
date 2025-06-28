@@ -15,7 +15,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     // For debugging purposes
-    console.log('Login component state:', { email, password, rememberMe, isLoading, errors });
+    // console.log('Login component state:', { email, password, rememberMe, isLoading, errors });
   }, [email, password, rememberMe, isLoading, errors]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,9 +30,9 @@ const LoginPage = () => {
     setErrors({});
     
     try {
-      console.log('Attempting login with:', { email, password, rememberMe });
+      // console.log('Attempting login with:', { email, password, rememberMe });
       await login(email, password, rememberMe);
-      console.log('Login successful, navigating to dashboard');
+      // console.log('Login successful, navigating to dashboard');
       navigate('/user-dashboard');
     } catch (error) {
       console.error('Login error caught in component:', error);

@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Debug middleware to check authentication state changes
   useEffect(() => {
-    console.log('Auth state changed:', { 
+    console.log('Auth state changed:', {
       isAuthenticated: !!user, 
       user, 
       token, 
@@ -142,7 +142,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         date_of_birth: userData.date_of_birth
       };
       
-      console.log('Sending registration data:', formattedData);
+      // console.log('Sending registration data:', formattedData);
       
       const response = await fetch(`${process.env.REACT_APP_API_URL}/users/register/`, {
         method: 'POST',
@@ -151,7 +151,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
 
       const data = await response.json();
-      console.log('Registration response:', data);
+      // console.log('Registration response:', data);
 
       if (response.ok) {
         // Create a temporary token since the backend doesn't provide one yet
@@ -179,7 +179,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     
     try {
-      console.log('Login attempt with:', { email, password });
+      // console.log('Login attempt with:', { email, password });
       
       try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/users/login/`, {
@@ -194,9 +194,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           })
         });
 
-        console.log('Login response status:', response.status);
+        // console.log('Login response status:', response.status);
         const data = await response.json();
-        console.log('Login response data:', data);
+        // console.log('Login response data:', data);
 
         if (response.ok) {
           // Extract the user from the backend response
@@ -234,12 +234,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Store in localStorage (persists even when browser is closed)
             localStorage.setItem('authToken', data.token);
             localStorage.setItem('userData', JSON.stringify(userData));
-            console.log('Credentials stored in localStorage (Remember Me enabled)');
+            // console.log('Credentials stored in localStorage (Remember Me enabled)');
           } else {
             // Store in sessionStorage (cleared when browser is closed)
             sessionStorage.setItem('authToken', data.token);
             sessionStorage.setItem('userData', JSON.stringify(userData));
-            console.log('Credentials stored in sessionStorage (Remember Me disabled)');
+            // console.log('Credentials stored in sessionStorage (Remember Me disabled)');
           }
           
           console.log('Login successful, user set to:', userData);
