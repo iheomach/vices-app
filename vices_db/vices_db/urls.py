@@ -21,6 +21,7 @@ from products.openai_views import generate_recommendations
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('health/', include('health.urls')),  # Health check endpoint
     path('api/users/', include('users.urls')),
     path('api/goals/', include('goals.urls')),
     path('api/tracking/', include('tracking.urls')),
