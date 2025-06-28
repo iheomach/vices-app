@@ -35,12 +35,12 @@ export class TrackingApi extends BaseApi {
   }
 
   async getStats(): Promise<Stats> {
-    const response = await this.fetchWithAuth('/tracking/stats/');
+    const response = await this.fetchWithAuth('/api/tracking/stats/');
     return response.json();
   }
 
   async getInsights(): Promise<Insight[]> {
-    const response = await this.fetchWithAuth('/tracking/insights/');
+    const response = await this.fetchWithAuth('/api/tracking/insights/');
     return response.json();
   }
 

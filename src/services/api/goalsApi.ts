@@ -8,7 +8,7 @@ export class GoalsApi extends BaseApi {
   }
 
   async getGoals(): Promise<Goal[]> {
-    const response = await this.fetchWithAuth('/goals/');
+    const response = await this.fetchWithAuth('/api/goals/');
     return response.json();
   }
 
@@ -42,7 +42,7 @@ export class GoalsApi extends BaseApi {
       end_date: endDate
     };
 
-    const response = await this.fetchWithAuth('/goals/', {
+    const response = await this.fetchWithAuth('/api/goals/', {
       method: 'POST',
       body: JSON.stringify(goalData)
     });
@@ -56,7 +56,7 @@ export class GoalsApi extends BaseApi {
   }
 
   async updateGoal(id: string, goal: Partial<Goal>): Promise<Goal> {
-    const response = await this.fetchWithAuth(`/goals/${id}/`, {
+    const response = await this.fetchWithAuth(`/api/goals/${id}/`, {
       method: 'PATCH',
       body: JSON.stringify(goal),
     });
@@ -68,7 +68,7 @@ export class GoalsApi extends BaseApi {
   }
 
   async deleteGoal(id: string): Promise<void> {
-    await this.fetchWithAuth(`/goals/${id}/`, {
+    await this.fetchWithAuth(`/api/goals/${id}/`, {
       method: 'DELETE',
     });
   }
