@@ -48,6 +48,14 @@ jobs:
       env:
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
         DJANGO_SETTINGS_MODULE: vices_db.settings.development
+        DB_NAME: test_db
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DEBUG: True
+        OPENAI_API_KEY: test-api-key-placeholder-not-used
+        SECRET_KEY: django-insecure-ci-test-key-safe-for-public-repo
       run: |
         cd vices_db
         python manage.py test
