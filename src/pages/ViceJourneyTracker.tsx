@@ -72,10 +72,10 @@ const ViceJourneyTracker: React.FC = () => {
   const goalsApi = new GoalsApi();
 
   useEffect(() => {
-    console.log('🔄 useEffect triggered, isAuthenticated:', isAuthenticated);
+    // console.log('🔄 useEffect triggered, isAuthenticated:', isAuthenticated);
     
     if (!isAuthenticated) {
-      console.log('❌ User not authenticated, redirecting to login');
+      // console.log('❌ User not authenticated, redirecting to login');
       navigate('/login');
       return;
     }
@@ -83,16 +83,16 @@ const ViceJourneyTracker: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log('🚀 Starting data fetch...');
+        // console.log('🚀 Starting data fetch...');
         
         // Test individual API calls first
-        console.log('📡 Testing journal API call...');
+        // console.log('📡 Testing journal API call...');
         try {
           const journalTest = await trackingApi.getJournalEntries();
-          console.log('✅ Journal API test successful:', journalTest);
-          console.log('📊 Journal response type:', typeof journalTest);
-          console.log('📊 Journal response is array:', Array.isArray(journalTest));
-          console.log('📊 Journal response length:', journalTest?.length);
+          // console.log('✅ Journal API test successful:', journalTest);
+          // console.log('📊 Journal response type:', typeof journalTest);
+          // console.log('📊 Journal response is array:', Array.isArray(journalTest));
+          // console.log('📊 Journal response length:', journalTest?.length);
         } catch (journalError) {
           console.error('❌ Journal API test failed:', journalError);
         }
@@ -117,19 +117,19 @@ const ViceJourneyTracker: React.FC = () => {
           })
         ]);
 
-        console.log('📊 Raw API Responses:');
-        console.log('  🎯 Goals:', goalsResponse);
-        console.log('  📝 Journal (RAW):', journalResponse);
-        console.log('  🧠 Insights:', insightsResponse);
-        console.log('  📈 Stats:', statsResponse);
+        // console.log('📊 Raw API Responses:');
+        // console.log('  🎯 Goals:', goalsResponse);
+        // console.log('  📝 Journal (RAW):', journalResponse);
+        // console.log('  🧠 Insights:', insightsResponse);
+        // console.log('  📈 Stats:', statsResponse);
 
         // Check if journal response has a nested structure
-        console.log('🔍 Analyzing journal response structure:');
+        // console.log('🔍 Analyzing journal response structure:');
         if (journalResponse) {
-          console.log('  📊 Journal keys:', Object.keys(journalResponse));
-          console.log('  📊 Journal.results exists:', 'results' in journalResponse);
-          console.log('  📊 Journal.data exists:', 'data' in journalResponse);
-          console.log('  📊 Journal is array:', Array.isArray(journalResponse));
+          // console.log('  📊 Journal keys:', Object.keys(journalResponse));
+          // console.log('  📊 Journal.results exists:', 'results' in journalResponse);
+          // console.log('  📊 Journal.data exists:', 'data' in journalResponse);
+          // console.log('  📊 Journal is array:', Array.isArray(journalResponse));
         }
 
         // Process the data safely
@@ -143,17 +143,17 @@ const ViceJourneyTracker: React.FC = () => {
         const safeInsightsData = safeInsights(insightsResponse);
         const safeStats = statsResponse || defaultUserData.stats;
 
-        console.log('✅ Processed data:');
-        console.log('  🎯 Safe goals:', safeGoalsData);
-        console.log('  📝 Safe journal:', safeJournalData);
-        console.log('  📝 Safe journal length:', safeJournalData?.length);
-        console.log('  🧠 Safe insights:', safeInsightsData);
-        console.log('  📈 Safe stats:', safeStats);
+        // console.log('✅ Processed data:');
+        // console.log('  🎯 Safe goals:', safeGoalsData);
+        // console.log('  📝 Safe journal:', safeJournalData);
+        // console.log('  📝 Safe journal length:', safeJournalData?.length);
+        // console.log('  🧠 Safe insights:', safeInsightsData);
+        // console.log('  📈 Safe stats:', safeStats);
 
         // Check what safeJournalEntries is doing
-        console.log('🔧 Testing safeJournalEntries function:');
-        console.log('  Input:', journalResponse);
-        console.log('  Output:', safeJournalData);
+        // console.log('🔧 Testing safeJournalEntries function:');
+        // console.log('  Input:', journalResponse);
+        // console.log('  Output:', safeJournalData);
 
         const newUserData = {
           goals: safeGoalsData,
@@ -162,12 +162,12 @@ const ViceJourneyTracker: React.FC = () => {
           stats: safeStats
         };
 
-        console.log('💾 Setting new user data:', newUserData);
+        // console.log('💾 Setting new user data:', newUserData);
         setUserData(newUserData);
         
         // Verify the state was set correctly
         setTimeout(() => {
-          console.log('🔍 Verifying state after update...');
+          // console.log('🔍 Verifying state after update...');
         }, 100);
         
       } catch (err) {
@@ -178,7 +178,7 @@ const ViceJourneyTracker: React.FC = () => {
         setError(err instanceof Error ? err.message : 'Failed to fetch data');
       } finally {
         setLoading(false);
-        console.log('✅ Loading complete');
+        // console.log('✅ Loading complete');
       }
     };
 
@@ -187,9 +187,9 @@ const ViceJourneyTracker: React.FC = () => {
 
   // Add a separate effect to monitor userData changes
   useEffect(() => {
-    console.log('📊 userData changed:', userData);
-    console.log('📝 Journal entries count:', userData.journalEntries?.length);
-    console.log('📝 Journal entries:', userData.journalEntries);
+    // console.log('📊 userData changed:', userData);
+    // console.log('📝 Journal entries count:', userData.journalEntries?.length);
+    // console.log('📝 Journal entries:', userData.journalEntries);
   }, [userData]);
 
   useEffect(() => {
@@ -198,7 +198,7 @@ const ViceJourneyTracker: React.FC = () => {
         try {
           setLoading(true);
           const goalsResponse = await goalsApi.getGoals();
-          console.log('Fetched goals:', goalsResponse);
+          // console.log('Fetched goals:', goalsResponse);
           let safeGoalsData: Goal[] = [];
           if (Array.isArray(goalsResponse)) {
             safeGoalsData = safeGoals(goalsResponse);
@@ -226,30 +226,30 @@ const ViceJourneyTracker: React.FC = () => {
         throw new Error('User not authenticated');
       }
 
-      console.log('💾 Saving journal entry:', entryData);
-      console.log('📋 Current journal entries before save:', userData.journalEntries);
+      // console.log('💾 Saving journal entry:', entryData);
+      // console.log('📋 Current journal entries before save:', userData.journalEntries);
 
       const savedEntry = await trackingApi.createJournalEntry({
         ...entryData,
         user: user.id
       });
 
-      console.log('✅ Saved entry response:', savedEntry);
+      // console.log('✅ Saved entry response:', savedEntry);
 
       setUserData(prev => {
         const currentEntries = safeJournalEntries(prev.journalEntries);
-        console.log('🔄 Updating with current entries:', currentEntries);
+        // console.log('🔄 Updating with current entries:', currentEntries);
         
         const newData = {
           ...prev,
           journalEntries: [...currentEntries, savedEntry]
         };
         
-        console.log('📝 New userData after save:', newData);
+        // console.log('📝 New userData after save:', newData);
         return newData;
       });
 
-      console.log('✅ Journal entry saved successfully');
+      // console.log('✅ Journal entry saved successfully');
     } catch (err) {
       console.error('❌ Failed to save journal entry:', err);
       setError(err instanceof Error ? err.message : 'Failed to save journal entry');

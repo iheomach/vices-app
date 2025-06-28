@@ -4,7 +4,7 @@ from .base import *
 
 # Security Settings
 DEBUG = False
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.railway.app,.render.com,.herokuapp.com').split(',')
 
 # Generate a new secret key for production
 SECRET_KEY = os.getenv('SECRET_KEY')
