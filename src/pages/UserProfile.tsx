@@ -82,7 +82,7 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!token) return;
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile/`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Token ${token}`,

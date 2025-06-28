@@ -119,7 +119,7 @@ const UserDashboard: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!token) return;
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile/`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Token ${token}`,
@@ -336,7 +336,7 @@ Return ONLY valid JSON array with this exact structure:
 
 Focus on harm reduction, wellness optimization, and evidence-based recommendations that specifically help achieve the ${moodDescriptions[activeMood as keyof typeof moodDescriptions]} feeling. Be specific with dosages, timing, and expected outcomes.`;
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/openai/`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/openai/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

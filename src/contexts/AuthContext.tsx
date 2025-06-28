@@ -104,7 +104,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchUserProfile = async (authToken: string) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile/`, {
         headers: { 
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json'
@@ -144,7 +144,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       // console.log('Sending registration data:', formattedData);
       
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/register/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formattedData)
@@ -182,7 +182,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // console.log('Login attempt with:', { email, password });
       
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/users/login/`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/login/`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -267,7 +267,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/profile/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile/`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',

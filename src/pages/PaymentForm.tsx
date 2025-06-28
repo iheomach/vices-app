@@ -34,7 +34,7 @@ const PaymentForm: React.FC = () => {
   });
 
   const createPaymentIntent = async (data: PaymentData): Promise<PaymentIntentResponse> => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/payments/create-payment-intent/`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/api/payments/create-payment-intent/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

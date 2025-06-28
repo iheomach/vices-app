@@ -64,7 +64,7 @@ export class BaseApi {
 }
 
 export async function requestPasswordChange(token: string) {
-  const response = await fetch(`${process.env.REACT_APP_API_URL}/users/request-password-change/`, {
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/request-password-change/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export async function requestPasswordChange(token: string) {
 }
 
 export async function confirmPasswordChange(token: string, code: string, newPassword: string) {
-  const response = await fetch(`${process.env.REACT_APP_API_URL}/users/confirm-password-change/`, {
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/confirm-password-change/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

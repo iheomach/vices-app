@@ -302,7 +302,7 @@ Focus on:
 Be honest about data limitations and don't make assumptions about patterns that aren't supported by your actual journal entries.`;
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/openai/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/openai/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

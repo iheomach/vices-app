@@ -21,7 +21,7 @@ const ForgotPasswordPage: React.FC = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/public-request-password-reset/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/public-request-password-reset/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -48,7 +48,7 @@ const ForgotPasswordPage: React.FC = () => {
     }
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/confirm-password-change/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/confirm-password-change/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code, new_password: newPassword }),
