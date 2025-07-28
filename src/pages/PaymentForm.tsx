@@ -21,7 +21,7 @@ interface PaymentFormState {
 const PaymentForm: React.FC = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, token } = useAuth();
 
   // Debug: Check environment variables
   console.log('Environment check:', {
@@ -50,18 +50,47 @@ const PaymentForm: React.FC = () => {
 
     try {
       console.log('Upgrading user to premium...');
-      
-      // Try different field names that Django might expect
-      const updateData = { 
-        account_tier: 'premium'
-      };
-      
-      console.log('Sending update data:', updateData);
+      console.log('Current user before update:', user);
       
       try {
-        // Update the user's account tier directly using AuthContext
-        await updateUser(updateData);
-        console.log('User successfully upgraded to premium via API!');
+        // Use the dedicated premium upgrade endpoint
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/upgrade-to-premium/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+          },
+          body: JSON.stringify({
+            user_id: user?.id,
+            payment_intent_id: 'stripe_payment_intent_id' // You can add the actual Stripe payment intent ID here if needed
+          })
+        });
+
+        if (response.ok) {
+          const updatedUser = await response.json();
+          console.log('User successfully upgraded to premium via dedicated endpoint!', updatedUser);
+          
+          // Update the user state directly since we got the updated user from the backend
+          // The backend returns: { id, email, first_name, last_name, account_tier }
+          // We need to merge this with the existing user data
+          if (user) {
+            const mergedUser = { ...user, ...updatedUser };
+            
+            // Update localStorage or sessionStorage with the merged user
+            const currentStoredToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            if (currentStoredToken) {
+              if (localStorage.getItem('authToken')) {
+                localStorage.setItem('userData', JSON.stringify(mergedUser));
+              } else {
+                sessionStorage.setItem('userData', JSON.stringify(mergedUser));
+              }
+            }
+          }
+        } else {
+          const errorData = await response.json();
+          console.error('Premium upgrade failed:', errorData);
+          throw new Error(errorData.error || 'Failed to upgrade to premium');
+        }
       } catch (apiError) {
         console.error('API update failed, trying local update:', apiError);
         
@@ -81,8 +110,6 @@ const PaymentForm: React.FC = () => {
           
           console.log('User upgraded to premium locally');
         }
-        
-        // Don't throw the error, payment was successful
       }
     } catch (error) {
       console.error('Error upgrading user to premium:', error);

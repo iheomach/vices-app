@@ -268,6 +268,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     try {
       console.log('Sending update request with data:', userData);
+      console.log('Data type check:', typeof userData, Object.keys(userData));
+      console.log('JSON stringified data:', JSON.stringify(userData));
       console.log('Using token:', token);
       console.log('API URL:', process.env.REACT_APP_API_URL);
       
@@ -281,6 +283,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
 
       console.log('Update response status:', response.status);
+      console.log('Response headers available:', response.headers);
       
       if (response.ok) {
         const updatedUser = await response.json();
@@ -299,6 +302,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } else {
         const errorData = await response.json();
         console.error('Update failed with error data:', errorData);
+        console.error('Full response details:', {
+          status: response.status,
+          statusText: response.statusText,
+          contentType: response.headers.get('content-type'),
+          errorData
+        });
         throw new Error(errorData.message || errorData.error || errorData.detail || 'Failed to update user');
       }
     } catch (error) {
