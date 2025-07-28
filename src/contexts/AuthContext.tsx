@@ -113,7 +113,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       if (response.ok) {
         const userData = await response.json();
-        setUser(userData);
+        // If backend doesn't return account_tier, preserve existing value or default to 'free'
+        const currentUser = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+        const updatedUser = {
+          ...currentUser,
+          ...userData,
+          account_tier: userData.account_tier || currentUser.account_tier || 'free'
+        };
+        setUser(updatedUser);
       } else {
         // Token is invalid, logout
         logout();
@@ -215,7 +222,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             preferred_categories: [],
             tolerance_level: '',
             favorite_effects: [],
-            account_tier: 'free',
+            account_tier: data.user.account_tier || 'free', // ✅ USE BACKEND DATA
             consumption_goals: [],
             receive_deal_notifications: true,
             is_verified: true, // Assuming the user is verified upon successful login
