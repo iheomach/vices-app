@@ -106,7 +106,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile/`, {
         headers: { 
-          'Authorization': `Bearer ${authToken}`,
+          'Authorization': `Token ${authToken}`,
           'Content-Type': 'application/json'
         }
       });
