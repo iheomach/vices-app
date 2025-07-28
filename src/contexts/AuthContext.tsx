@@ -203,7 +203,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         // console.log('Login response status:', response.status);
         const data = await response.json();
-        // console.log('Login response data:', data);
+        console.log('🔍 Full login response data:', JSON.stringify(data, null, 2));
+        console.log('🔍 Backend user data:', data.user);
+        console.log('🔍 All user keys:', Object.keys(data.user || {}));
+        console.log('🔍 Backend account_tier:', data.user?.account_tier);
+        console.log('🔍 account_tier type:', typeof data.user?.account_tier);
 
         if (response.ok) {
           // Extract the user from the backend response
@@ -230,6 +234,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           };
+          
+          console.log('🔍 Created userData object:', userData);
+          console.log('🔍 Final account_tier value:', userData.account_tier);
+          console.log('🔍 Account tier source:', {
+            from_backend: data.user?.account_tier,
+            fallback_used: !data.user?.account_tier,
+            final_value: userData.account_tier
+          });
           
           setUser(userData);
           
