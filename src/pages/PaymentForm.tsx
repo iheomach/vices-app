@@ -9,6 +9,7 @@ import {
 import { StripeCardElement } from '@stripe/stripe-js';
 import { PaymentData, PaymentIntentResponse } from '../types/payment';
 import Header from '../components/Header';
+import { useAuth } from '../contexts/AuthContext';
 
 interface PaymentFormState {
   loading: boolean;
@@ -20,6 +21,7 @@ interface PaymentFormState {
 const PaymentForm: React.FC = () => {
   const stripe = useStripe();
   const elements = useElements();
+  const { user, updateUser } = useAuth();
 
   // Debug: Check environment variables
   console.log('Environment check:', {
@@ -37,8 +39,53 @@ const PaymentForm: React.FC = () => {
   const [paymentData] = useState<PaymentData>({
     amount: 999, // $9.99 in cents
     currency: 'usd',
-    user_id: 'user_123',
+    user_id: user?.id || 'guest',
   });
+
+  const upgradeUserToPremium = async (): Promise<void> => {
+    if (!user) {
+      console.error('No user found to upgrade');
+      return;
+    }
+
+    const apiUrl = process.env.REACT_APP_API_URL;
+    if (!apiUrl) {
+      console.error('API URL not configured');
+      return;
+    }
+
+    try {
+      const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+      if (!authToken) {
+        console.error('No auth token found');
+        return;
+      }
+
+      const response = await fetch(`${apiUrl}/api/users/upgrade-to-premium/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${authToken}`,
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          payment_intent_id: 'from_stripe', // You can pass the actual payment intent ID
+        }),
+      });
+
+      if (response.ok) {
+        const updatedUserData = await response.json();
+        console.log('User upgraded to premium:', updatedUserData);
+        
+        // Update the user in AuthContext
+        await updateUser({ account_tier: 'premium' });
+      } else {
+        console.error('Failed to upgrade user:', response.status);
+      }
+    } catch (error) {
+      console.error('Error upgrading user to premium:', error);
+    }
+  };
 
   const createPaymentIntent = async (data: PaymentData): Promise<PaymentIntentResponse> => {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -122,14 +169,17 @@ const PaymentForm: React.FC = () => {
           processing: false,
         }));
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        console.log('Payment successful:', paymentIntent);
+        
+        // Upgrade user to premium after successful payment
+        await upgradeUserToPremium();
+        
         setFormState(prev => ({
           ...prev,
           success: true,
           loading: false,
           processing: false,
         }));
-        // Handle successful payment
-        console.log('Payment successful:', paymentIntent);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Payment failed. Please try again.';
@@ -173,8 +223,10 @@ const PaymentForm: React.FC = () => {
           <div className="relative w-full max-w-md">
             <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 text-center">
               <h2 className="text-2xl font-bold text-[#7CC379] mb-2">Payment Successful!</h2>
-              <p className="text-green-100/80 mb-4">Thank you for your purchase.</p>
-              <a href="/" className="inline-block mt-4 px-6 py-2 bg-[#7CC379] text-black rounded-lg font-semibold hover:bg-[#5a9556] transition">Return Home</a>
+              <p className="text-green-100/80 mb-2">Thank you for your purchase.</p>
+              <p className="text-[#7CC379] font-semibold mb-4">Welcome to Premium!</p>
+              <p className="text-green-100/70 text-sm mb-4">Your account has been upgraded and you now have access to all premium features.</p>
+              <a href="/user-dashboard" className="inline-block mt-4 px-6 py-2 bg-[#7CC379] text-black rounded-lg font-semibold hover:bg-[#5a9556] transition">Go to Dashboard</a>
             </div>
           </div>
         </div>

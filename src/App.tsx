@@ -24,7 +24,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="App">
-          <Routes>
+            <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/usersignup" element={<UserSignupPage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -36,27 +36,29 @@ function App() {
             <Route
               path="/payment"
               element={
+              <ProtectedRoute>
                 <Elements stripe={stripePromise}>
-                  <PaymentForm />
+                <PaymentForm />
                 </Elements>
+              </ProtectedRoute>
               }
             />
             <Route path="/vice-journey-tracker" element={
               <ProtectedRoute>
-                <ViceJourneyTracker />
+              <ViceJourneyTracker />
               </ProtectedRoute>
             } />
             <Route path="/user-dashboard" element={
               <ProtectedRoute>
-                <UserDashboard />
+              <UserDashboard />
               </ProtectedRoute>
             } />
             <Route path="/profile" element={
               <ProtectedRoute>
-                <ProfilePage />
+              <ProfilePage />
               </ProtectedRoute>
             } />
-          </Routes>
+            </Routes>
         </div>
       </Router>
     </AuthProvider>
