@@ -21,6 +21,12 @@ const PaymentForm: React.FC = () => {
   const stripe = useStripe();
   const elements = useElements();
 
+  // Debug: Check environment variables
+  console.log('Environment check:', {
+    REACT_APP_API_URL: process.env.REACT_APP_API_URL,
+    NODE_ENV: process.env.NODE_ENV
+  });
+
   const [formState, setFormState] = useState<PaymentFormState>({
     loading: false,
     error: null,
@@ -35,19 +41,49 @@ const PaymentForm: React.FC = () => {
   });
 
   const createPaymentIntent = async (data: PaymentData): Promise<PaymentIntentResponse> => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/payments/create-payment-intent/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const apiUrl = process.env.REACT_APP_API_URL;
+    console.log('API URL:', apiUrl);
+    console.log('Payment data:', data);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (!apiUrl) {
+      throw new Error('API URL not configured. Please check your environment variables.');
     }
 
-    return response.json();
+    try {
+      const response = await fetch(`${apiUrl}/api/payments/create-payment-intent/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        
+        if (response.status === 502) {
+          throw new Error('Backend server is not responding. Please try again later.');
+        } else if (response.status === 404) {
+          throw new Error('Payment endpoint not found. Please contact support.');
+        } else if (response.status >= 500) {
+          throw new Error('Server error. Please try again later.');
+        } else {
+          throw new Error(`Payment failed: ${errorText || 'Unknown error'}`);
+        }
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Network or parsing error:', error);
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Unable to connect to payment server. Please check your internet connection.');
+      }
+      throw error;
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
