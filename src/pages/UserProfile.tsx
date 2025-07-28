@@ -382,6 +382,27 @@ const ProfilePage: React.FC = () => {
           {/* Account Tab */}
           {activeTab === 'account' && (
             <div className="space-y-6">
+              {/* Account Type Display */}
+              <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
+                <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Account Information</h2>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-black/30 rounded-lg">
+                    <div>
+                      <h3 className="font-medium text-white">Account Type</h3>
+                      <p className="text-sm text-gray-300">Your current subscription plan</p>
+                    </div>
+                    <div className={`px-4 py-2 rounded-lg font-medium ${
+                      user?.account_tier === 'premium' 
+                        ? 'bg-gradient-to-r from-[#7CC379] to-[#5a9556] text-white' 
+                        : 'bg-gray-600 text-gray-200'
+                    }`}>
+                      {user?.account_tier === 'premium' ? 'Premium' : 'Free'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Data Export */}
               <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
                 <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Data Management</h2>
