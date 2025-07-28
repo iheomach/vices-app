@@ -267,6 +267,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     
     try {
+      console.log('Sending update request with data:', userData);
+      console.log('Using token:', token);
+      console.log('API URL:', process.env.REACT_APP_API_URL);
+      
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile/`, {
         method: 'PUT',
         headers: { 
@@ -276,14 +280,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         body: JSON.stringify(userData)
       });
 
+      console.log('Update response status:', response.status);
+      
       if (response.ok) {
         const updatedUser = await response.json();
+        console.log('Update successful, received user:', updatedUser);
         setUser(updatedUser);
+        
+        // Update stored user data in localStorage/sessionStorage
+        const currentStoredToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        if (currentStoredToken) {
+          if (localStorage.getItem('authToken')) {
+            localStorage.setItem('userData', JSON.stringify(updatedUser));
+          } else {
+            sessionStorage.setItem('userData', JSON.stringify(updatedUser));
+          }
+        }
       } else {
-        const data = await response.json();
-        throw new Error(data.message || 'Failed to update user');
+        const errorData = await response.json();
+        console.error('Update failed with error data:', errorData);
+        throw new Error(errorData.message || errorData.error || errorData.detail || 'Failed to update user');
       }
     } catch (error) {
+      console.error('Update user catch block error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to update user';
       setError(errorMessage);
       throw error;
