@@ -10,6 +10,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ViceJourneyTracker from './pages/ViceJourneyTracker';
 import './index.css'; // or wherever your global styles are
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY!);
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import PaymentForm from './pages/PaymentForm';
@@ -32,14 +33,14 @@ function App() {
             <Route path="/about" element={<AboutUsPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-            {/* <Route
+            <Route
               path="/payment"
               element={
                 <Elements stripe={stripePromise}>
                   <PaymentForm />
                 </Elements>
               }
-            /> */}
+            />
             <Route path="/vice-journey-tracker" element={
               <ProtectedRoute>
                 <ViceJourneyTracker />

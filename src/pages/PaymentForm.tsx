@@ -7,7 +7,8 @@ import {
   CardElementProps,
 } from '@stripe/react-stripe-js';
 import { StripeCardElement } from '@stripe/stripe-js';
-import { PaymentData, PaymentIntentResponse, PaymentError } from '../types/payment';
+import { PaymentData, PaymentIntentResponse } from '../types/payment';
+import Header from '../components/Header';
 
 interface PaymentFormState {
   loading: boolean;
@@ -19,7 +20,7 @@ interface PaymentFormState {
 const PaymentForm: React.FC = () => {
   const stripe = useStripe();
   const elements = useElements();
-  
+
   const [formState, setFormState] = useState<PaymentFormState>({
     loading: false,
     error: null,
@@ -27,19 +28,17 @@ const PaymentForm: React.FC = () => {
     processing: false,
   });
 
-  const [paymentData, setPaymentData] = useState<PaymentData>({
-    amount: 2000, // $20.00 in cents
+  const [paymentData] = useState<PaymentData>({
+    amount: 999, // $9.99 in cents
     currency: 'usd',
     user_id: 'user_123',
   });
 
   const createPaymentIntent = async (data: PaymentData): Promise<PaymentIntentResponse> => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/api/payments/create-payment-intent/`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/payments/create-payment-intent/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Add authorization header if needed
-        // 'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
@@ -53,13 +52,13 @@ const PaymentForm: React.FC = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    
+
     if (!stripe || !elements) {
       return;
     }
 
     const cardElement = elements.getElement(CardElement) as StripeCardElement;
-    
+
     if (!cardElement) {
       setFormState(prev => ({ ...prev, error: 'Card element not found' }));
       return;
@@ -68,15 +67,13 @@ const PaymentForm: React.FC = () => {
     setFormState(prev => ({ ...prev, loading: true, error: null, processing: true }));
 
     try {
-      // Create payment intent on your backend
       const { client_secret } = await createPaymentIntent(paymentData);
 
-      // Confirm payment with Stripe
       const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
         payment_method: {
           card: cardElement,
           billing_details: {
-            name: 'Customer Name', // You can collect this from a form
+            name: 'Customer Name',
           },
         },
       });
@@ -95,7 +92,6 @@ const PaymentForm: React.FC = () => {
           loading: false,
           processing: false,
         }));
-        
         // Handle successful payment
         console.log('Payment successful:', paymentIntent);
       }
@@ -114,67 +110,97 @@ const PaymentForm: React.FC = () => {
     style: {
       base: {
         fontSize: '16px',
-        color: '#424770',
+        color: '#ffffff',
+        fontFamily: 'Inter, sans-serif',
+        backgroundColor: 'transparent',
         '::placeholder': {
-          color: '#aab7c4',
+          color: '#9ca3af',
         },
       },
       invalid: {
-        color: '#9e2146',
+        color: '#ef4444',
       },
     },
   };
 
   if (formState.success) {
     return (
-      <div className="payment-success">
-        <h2>Payment Successful!</h2>
-        <p>Thank you for your purchase.</p>
+      <div className="min-h-screen bg-[#1B272C] flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center p-6 pt-24">
+          {/* Background Effects */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#7CC379]/10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+          </div>
+
+          <div className="relative w-full max-w-md">
+            <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 text-center">
+              <h2 className="text-2xl font-bold text-[#7CC379] mb-2">Payment Successful!</h2>
+              <p className="text-green-100/80 mb-4">Thank you for your purchase.</p>
+              <a href="/" className="inline-block mt-4 px-6 py-2 bg-[#7CC379] text-black rounded-lg font-semibold hover:bg-[#5a9556] transition">Return Home</a>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="payment-form-container">
-      <form onSubmit={handleSubmit} className="payment-form">
-        <div className="form-group">
-          <label htmlFor="amount">Amount</label>
-          <input
-            type="number"
-            id="amount"
-            value={paymentData.amount / 100}
-            onChange={(e) =>
-              setPaymentData(prev => ({
-                ...prev,
-                amount: parseFloat(e.target.value) * 100,
-              }))
-            }
-            min="0.50"
-            step="0.01"
-            disabled={formState.processing}
-          />
+    <div className="min-h-screen bg-[#1B272C] flex flex-col">
+      <Header />
+      <div className="flex-1 flex items-center justify-center p-6 pt-24">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#7CC379]/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="card-element-container">
-          <CardElement options={cardStyle} />
+        <div className="relative w-full max-w-md">
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 space-y-6"
+          >
+            <h2 className="text-2xl font-bold text-[#7CC379] mb-4 text-center">Complete Your Payment</h2>
+            <div className="mb-4">
+              <label className="block text-green-100/80 font-medium mb-1">Amount</label>
+              <div className="w-full px-4 py-2 rounded-lg border border-[#7CC379]/30 bg-white/10 text-white">
+                $9.99 USD
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-green-100/80 font-medium mb-1">Card Details</label>
+              <div className="rounded-lg border border-[#7CC379]/30 bg-white/10 p-3">
+                <CardElement options={cardStyle} />
+              </div>
+            </div>
+
+            {formState.error && (
+              <div className="bg-red-100 text-red-700 rounded-lg px-4 py-2 mb-2 text-center" role="alert">
+                {formState.error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={formState.loading || formState.processing || !stripe}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-green-500/30 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            >
+              {(formState.loading || formState.processing) ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span>Processing...</span>
+              </>
+              ) : (
+              <>
+                <span>Pay ${ (paymentData.amount / 100).toFixed(2) }</span>
+              </>
+              )}
+            </button>
+          </form>
         </div>
-
-        {formState.error && (
-          <div className="error-message" role="alert">
-            {formState.error}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={!stripe || formState.loading || formState.processing}
-          className="pay-button"
-        >
-          {formState.processing
-            ? 'Processing...'
-            : `Pay $${(paymentData.amount / 100).toFixed(2)}`}
-        </button>
-      </form>
+      </div>
     </div>
   );
 };
