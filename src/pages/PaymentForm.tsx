@@ -48,40 +48,13 @@ const PaymentForm: React.FC = () => {
       return;
     }
 
-    const apiUrl = process.env.REACT_APP_API_URL;
-    if (!apiUrl) {
-      console.error('API URL not configured');
-      return;
-    }
-
     try {
-      const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-      if (!authToken) {
-        console.error('No auth token found');
-        return;
-      }
-
-      const response = await fetch(`${apiUrl}/api/users/upgrade-to-premium/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${authToken}`,
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          payment_intent_id: 'from_stripe', // You can pass the actual payment intent ID
-        }),
-      });
-
-      if (response.ok) {
-        const updatedUserData = await response.json();
-        console.log('User upgraded to premium:', updatedUserData);
-        
-        // Update the user in AuthContext
-        await updateUser({ account_tier: 'premium' });
-      } else {
-        console.error('Failed to upgrade user:', response.status);
-      }
+      console.log('Upgrading user to premium...');
+      
+      // Update the user's account tier directly using AuthContext
+      await updateUser({ account_tier: 'premium' });
+      
+      console.log('User successfully upgraded to premium!');
     } catch (error) {
       console.error('Error upgrading user to premium:', error);
     }
