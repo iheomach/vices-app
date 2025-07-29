@@ -37,7 +37,7 @@ const PaymentForm: React.FC = () => {
   });
 
   const [subscriptionData] = useState({
-    price_id: 'price_1RqLpiKrgfp4oNY3JNpnoP8x', // Replace with the price ID from Stripe Dashboard
+    price_id: 'price_1RqN4fKrgfp4oNY3kDtd7Cvs', // Replace with the price ID from Stripe Dashboard
     user_id: user?.id || 'guest',
     email: user?.email || '',
   });
