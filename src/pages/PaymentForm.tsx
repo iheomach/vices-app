@@ -37,7 +37,7 @@ const PaymentForm: React.FC = () => {
   });
 
   const [paymentData] = useState<PaymentData>({
-    amount: 50, // $0.50 in cents
+    amount: 999, // 9.99 in cents
     currency: 'usd',
     user_id: user?.id || 'guest',
   });
