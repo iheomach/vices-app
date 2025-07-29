@@ -21,7 +21,7 @@ interface PaymentFormState {
 const PaymentForm: React.FC = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, token } = useAuth(); // ✅ Get token at component level
 
   // Debug: Check environment variables
   console.log('Environment check:', {
@@ -71,11 +71,19 @@ const PaymentForm: React.FC = () => {
     }
 
     try {
+      // ✅ Use token from component scope
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      // ✅ Include Authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Token ${token}`;
+      }
+
       const response = await fetch(`${apiUrl}/api/payments/create-subscription/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(data),
       });
 
