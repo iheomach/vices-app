@@ -51,6 +51,14 @@ const SubscriptionManagement: React.FC = () => {
 
     try {
       setLoading(true);
+      
+      // Debug logging
+      console.log('🔍 Fetching subscription data for user:', {
+        userId: user.id,
+        userIdType: typeof user.id,
+        token: token ? 'present' : 'missing'
+      });
+      
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/payments/subscription-status/${user.id}/`, {
         headers: {
           'Authorization': `Token ${token}`,
@@ -58,15 +66,20 @@ const SubscriptionManagement: React.FC = () => {
         },
       });
 
+      console.log('🔍 Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('🔍 Success data received:', data);
         setSubscription(data.subscription);
         setInvoices(data.invoices || []);
       } else {
         const errorData = await response.json();
+        console.error('🚨 Error response:', errorData);
         setError(errorData.error || 'Failed to fetch subscription data');
       }
     } catch (err) {
+      console.error('🚨 Network error:', err);
       setError('Network error while fetching subscription data');
     } finally {
       setLoading(false);
