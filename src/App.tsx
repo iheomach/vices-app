@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ViceJourneyTracker from './pages/ViceJourneyTracker';
+import SubscriptionManagement from './pages/SubscriptionManagement';
 import './index.css'; // or wherever your global styles are
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY!);
 import { Elements } from '@stripe/react-stripe-js';
@@ -56,6 +57,11 @@ function App() {
             <Route path="/profile" element={
               <ProtectedRoute>
               <ProfilePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/subscription-management" element={
+              <ProtectedRoute>
+              <SubscriptionManagement />
               </ProtectedRoute>
             } />
             </Routes>

@@ -7,7 +7,7 @@ import {
   CardElementProps,
 } from '@stripe/react-stripe-js';
 import { StripeCardElement } from '@stripe/stripe-js';
-import { PaymentData, PaymentIntentResponse } from '../types/payment';
+import { PaymentData, PaymentIntentResponse, SubscriptionData, SubscriptionResponse } from '../types/payment';
 import Header from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -21,7 +21,7 @@ interface PaymentFormState {
 const PaymentForm: React.FC = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { user, updateUser, token } = useAuth();
+  const { user, updateUser } = useAuth();
 
   // Debug: Check environment variables
   console.log('Environment check:', {
@@ -36,10 +36,10 @@ const PaymentForm: React.FC = () => {
     processing: false,
   });
 
-  const [paymentData] = useState<PaymentData>({
-    amount: 999, // 9.99 in cents
-    currency: 'usd',
+  const [subscriptionData] = useState({
+    price_id: 'price_1RqLpiKrgfp4oNY3JNpnoP8x', // Replace with the price ID from Stripe Dashboard
     user_id: user?.id || 'guest',
+    email: user?.email || '',
   });
 
   const upgradeUserToPremium = async (): Promise<void> => {
@@ -50,85 +50,28 @@ const PaymentForm: React.FC = () => {
 
     try {
       console.log('Upgrading user to premium...');
-      console.log('Current user before update:', user);
       
-      try {
-        // Use the dedicated premium upgrade endpoint
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/upgrade-to-premium/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
-          },
-          body: JSON.stringify({
-            user_id: user?.id,
-            payment_intent_id: 'stripe_payment_intent_id' // You can add the actual Stripe payment intent ID here if needed
-          })
-        });
-
-        if (response.ok) {
-          const updatedUser = await response.json();
-          console.log('User successfully upgraded to premium via dedicated endpoint!', updatedUser);
-          
-          // Update the user state directly since we got the updated user from the backend
-          // The backend returns: { id, email, first_name, last_name, account_tier }
-          // We need to merge this with the existing user data
-          if (user) {
-            const mergedUser = { ...user, ...updatedUser };
-            
-            // Update localStorage or sessionStorage with the merged user
-            const currentStoredToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-            if (currentStoredToken) {
-              if (localStorage.getItem('authToken')) {
-                localStorage.setItem('userData', JSON.stringify(mergedUser));
-              } else {
-                sessionStorage.setItem('userData', JSON.stringify(mergedUser));
-              }
-            }
-          }
-        } else {
-          const errorData = await response.json();
-          console.error('Premium upgrade failed:', errorData);
-          throw new Error(errorData.error || 'Failed to upgrade to premium');
-        }
-      } catch (apiError) {
-        console.error('API update failed, trying local update:', apiError);
-        
-        // Fallback: Update locally if API fails
-        if (user) {
-          const updatedUser = { ...user, account_tier: 'premium' };
-          
-          // Update localStorage or sessionStorage
-          const currentStoredToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-          if (currentStoredToken) {
-            if (localStorage.getItem('authToken')) {
-              localStorage.setItem('userData', JSON.stringify(updatedUser));
-            } else {
-              sessionStorage.setItem('userData', JSON.stringify(updatedUser));
-            }
-          }
-          
-          console.log('User upgraded to premium locally');
-        }
-      }
+      // Update the user's account tier directly using AuthContext
+      await updateUser({ account_tier: 'premium' });
+      
+      console.log('User successfully upgraded to premium!');
     } catch (error) {
       console.error('Error upgrading user to premium:', error);
     }
   };
 
-  const createPaymentIntent = async (data: PaymentData): Promise<PaymentIntentResponse> => {
+  const createSubscription = async (data: SubscriptionData): Promise<SubscriptionResponse> => {
     const apiUrl = process.env.REACT_APP_API_URL;
-    console.log('💳 Creating Payment Intent...');
-    console.log('💳 API URL:', apiUrl);
-    console.log('💳 Payment data:', data);
+    console.log('Creating subscription...');
+    console.log('API URL:', apiUrl);
+    console.log('Subscription data:', data);
 
     if (!apiUrl) {
       throw new Error('API URL not configured. Please check your environment variables.');
     }
 
     try {
-      console.log('💳 Sending request to payment endpoint...');
-      const response = await fetch(`${apiUrl}/api/payments/create-payment-intent/`, {
+      const response = await fetch(`${apiUrl}/api/payments/create-subscription/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,30 +79,25 @@ const PaymentForm: React.FC = () => {
         body: JSON.stringify(data),
       });
 
-      console.log('💳 Payment API Response status:', response.status);
-      console.log('💳 Response headers:', response.headers);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('💳 Payment API Error Response:', errorText);
+        console.error('API Error Response:', errorText);
         
         if (response.status === 502) {
           throw new Error('Backend server is not responding. Please try again later.');
         } else if (response.status === 404) {
-          throw new Error('Payment endpoint not found. Please contact support.');
+          throw new Error('Subscription endpoint not found. Please contact support.');
         } else if (response.status >= 500) {
           throw new Error('Server error. Please try again later.');
         } else {
-          throw new Error(`Payment failed: ${errorText || 'Unknown error'}`);
+          throw new Error(`Subscription creation failed: ${errorText || 'Unknown error'}`);
         }
       }
 
-      const result = await response.json();
-      console.log('💳 Payment Intent created successfully!');
-      console.log('💳 Client secret received:', result.client_secret ? 'Yes' : 'No');
-      console.log('💳 Full response:', result);
-      
-      return result;
+      return response.json();
     } catch (error) {
       console.error('Network or parsing error:', error);
       if (error instanceof TypeError && error.message.includes('fetch')) {
@@ -186,40 +124,31 @@ const PaymentForm: React.FC = () => {
     setFormState(prev => ({ ...prev, loading: true, error: null, processing: true }));
 
     try {
-      console.log('🎯 Creating payment intent for amount:', paymentData.amount);
-      console.log('🎯 Payment data:', paymentData);
-      
-      const { client_secret } = await createPaymentIntent(paymentData);
-      console.log('🎯 Payment intent created, client_secret received');
+      const { client_secret, subscription_id } = await createSubscription(subscriptionData);
 
-      console.log('🎯 Confirming payment with Stripe...');
       const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
         payment_method: {
           card: cardElement,
           billing_details: {
-            name: 'Customer Name',
+            name: user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : 'Customer Name',
+            email: user?.email || '',
           },
         },
       });
 
       if (error) {
-        console.error('🚨 Stripe payment error:', error);
-        console.error('🚨 Error code:', error.code);
-        console.error('🚨 Error message:', error.message);
+        console.error('Subscription payment error:', error);
         setFormState(prev => ({
           ...prev,
-          error: error.message || 'Payment failed',
+          error: error.message || 'Subscription setup failed',
           loading: false,
           processing: false,
         }));
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        console.log('🎉 Payment succeeded!');
-        console.log('🎉 Payment Intent ID:', paymentIntent.id);
-        console.log('🎉 Amount charged:', paymentIntent.amount);
-        console.log('🎉 Payment method:', paymentIntent.payment_method);
-        console.log('Payment successful:', paymentIntent);
+        console.log('Subscription payment successful:', paymentIntent);
+        console.log('Subscription ID:', subscription_id);
         
-        // Upgrade user to premium after successful payment
+        // Upgrade user to premium after successful subscription setup
         await upgradeUserToPremium();
         
         setFormState(prev => ({
@@ -270,10 +199,11 @@ const PaymentForm: React.FC = () => {
 
           <div className="relative w-full max-w-md">
             <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 text-center">
-              <h2 className="text-2xl font-bold text-[#7CC379] mb-2">Payment Successful!</h2>
-              <p className="text-green-100/80 mb-2">Thank you for your purchase.</p>
+              <h2 className="text-2xl font-bold text-[#7CC379] mb-2">Subscription Active!</h2>
+              <p className="text-green-100/80 mb-2">Thank you for subscribing to Premium.</p>
               <p className="text-[#7CC379] font-semibold mb-4">Welcome to Premium!</p>
-              <p className="text-green-100/70 text-sm mb-4">Your account has been upgraded and you now have access to all premium features.</p>
+              <p className="text-green-100/70 text-sm mb-2">Your monthly subscription is now active and you have access to all premium features.</p>
+              <p className="text-green-100/60 text-xs mb-4">You'll be charged $9.99 monthly. Cancel anytime from your account settings.</p>
               <a href="/user-dashboard" className="inline-block mt-4 px-6 py-2 bg-[#7CC379] text-black rounded-lg font-semibold hover:bg-[#5a9556] transition">Go to Dashboard</a>
             </div>
           </div>
@@ -297,12 +227,13 @@ const PaymentForm: React.FC = () => {
             onSubmit={handleSubmit}
             className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 space-y-6"
           >
-            <h2 className="text-2xl font-bold text-[#7CC379] mb-4 text-center">Complete Your Payment</h2>
+            <h2 className="text-2xl font-bold text-[#7CC379] mb-4 text-center">Start Your Premium Subscription</h2>
             <div className="mb-4">
-              <label className="block text-green-100/80 font-medium mb-1">Amount</label>
+              <label className="block text-green-100/80 font-medium mb-1">Monthly Subscription</label>
               <div className="w-full px-4 py-2 rounded-lg border border-[#7CC379]/30 bg-white/10 text-white">
-                $9.99 USD
+                $9.99 USD / month
               </div>
+              <p className="text-green-100/60 text-sm mt-1">Cancel anytime from your account settings</p>
             </div>
 
             <div className="mb-4">
@@ -330,7 +261,7 @@ const PaymentForm: React.FC = () => {
               </>
               ) : (
               <>
-                <span>Pay ${ (paymentData.amount / 100).toFixed(2) }</span>
+                <span>Subscribe for $9.99/month</span>
               </>
               )}
             </button>

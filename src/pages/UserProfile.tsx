@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
-import { User, Mail, Lock, Bell, Shield, Download, Trash2, Edit3, Save, X } from 'lucide-react';
+import { User, Mail, Lock, Bell, Shield, Download, Trash2, Edit3, Save, X, Settings } from 'lucide-react';
 import { GoalsApi } from '../services/api/goalsApi';
 import { TrackingApi } from '../services/api/trackingApi';
 import { requestPasswordChange, confirmPasswordChange } from '../services/api/apiUtils';
@@ -400,6 +400,22 @@ const ProfilePage: React.FC = () => {
                       {user?.account_tier === 'premium' ? 'Premium' : 'Free'}
                     </div>
                   </div>
+
+                  {user?.account_tier === 'premium' && (
+                    <div className="flex items-center justify-between p-4 bg-black/30 rounded-lg">
+                      <div>
+                        <h3 className="font-medium text-white">Manage Subscription</h3>
+                        <p className="text-sm text-gray-300">View billing, cancel, or update your subscription</p>
+                      </div>
+                      <a
+                        href="/subscription-management"
+                        className="flex items-center space-x-2 bg-[#7CC379]/20 text-[#7CC379] px-4 py-2 rounded-lg hover:bg-[#7CC379]/30 transition-all"
+                      >
+                        <Settings className="w-4 h-4" />
+                        <span>Manage</span>
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
 
