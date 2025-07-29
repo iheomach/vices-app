@@ -37,7 +37,7 @@ const PaymentForm: React.FC = () => {
   });
 
   const [paymentData] = useState<PaymentData>({
-    amount: 999, // $9.99 in cents
+    amount: 50, // $0.50 in cents
     currency: 'usd',
     user_id: user?.id || 'guest',
   });
@@ -118,14 +118,16 @@ const PaymentForm: React.FC = () => {
 
   const createPaymentIntent = async (data: PaymentData): Promise<PaymentIntentResponse> => {
     const apiUrl = process.env.REACT_APP_API_URL;
-    console.log('API URL:', apiUrl);
-    console.log('Payment data:', data);
+    console.log('💳 Creating Payment Intent...');
+    console.log('💳 API URL:', apiUrl);
+    console.log('💳 Payment data:', data);
 
     if (!apiUrl) {
       throw new Error('API URL not configured. Please check your environment variables.');
     }
 
     try {
+      console.log('💳 Sending request to payment endpoint...');
       const response = await fetch(`${apiUrl}/api/payments/create-payment-intent/`, {
         method: 'POST',
         headers: {
@@ -134,12 +136,12 @@ const PaymentForm: React.FC = () => {
         body: JSON.stringify(data),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
+      console.log('💳 Payment API Response status:', response.status);
+      console.log('💳 Response headers:', response.headers);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('API Error Response:', errorText);
+        console.error('💳 Payment API Error Response:', errorText);
         
         if (response.status === 502) {
           throw new Error('Backend server is not responding. Please try again later.');
@@ -152,7 +154,12 @@ const PaymentForm: React.FC = () => {
         }
       }
 
-      return response.json();
+      const result = await response.json();
+      console.log('💳 Payment Intent created successfully!');
+      console.log('💳 Client secret received:', result.client_secret ? 'Yes' : 'No');
+      console.log('💳 Full response:', result);
+      
+      return result;
     } catch (error) {
       console.error('Network or parsing error:', error);
       if (error instanceof TypeError && error.message.includes('fetch')) {
@@ -179,8 +186,13 @@ const PaymentForm: React.FC = () => {
     setFormState(prev => ({ ...prev, loading: true, error: null, processing: true }));
 
     try {
+      console.log('🎯 Creating payment intent for amount:', paymentData.amount);
+      console.log('🎯 Payment data:', paymentData);
+      
       const { client_secret } = await createPaymentIntent(paymentData);
+      console.log('🎯 Payment intent created, client_secret received');
 
+      console.log('🎯 Confirming payment with Stripe...');
       const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
         payment_method: {
           card: cardElement,
@@ -191,6 +203,9 @@ const PaymentForm: React.FC = () => {
       });
 
       if (error) {
+        console.error('🚨 Stripe payment error:', error);
+        console.error('🚨 Error code:', error.code);
+        console.error('🚨 Error message:', error.message);
         setFormState(prev => ({
           ...prev,
           error: error.message || 'Payment failed',
@@ -198,6 +213,10 @@ const PaymentForm: React.FC = () => {
           processing: false,
         }));
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        console.log('🎉 Payment succeeded!');
+        console.log('🎉 Payment Intent ID:', paymentIntent.id);
+        console.log('🎉 Amount charged:', paymentIntent.amount);
+        console.log('🎉 Payment method:', paymentIntent.payment_method);
         console.log('Payment successful:', paymentIntent);
         
         // Upgrade user to premium after successful payment
