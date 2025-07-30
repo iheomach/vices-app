@@ -1,0 +1,15 @@
+{
+  "short_name": "VICES",
+  "name": "VICES - Wellness Tracking",
+  "icons": [
+    {
+      "src": "images/vices.png",
+      "type": "image/png",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#7CC379",
+  "background_color": "#000000"
+}

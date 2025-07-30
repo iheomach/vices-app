@@ -16,14 +16,20 @@ import {
 interface Subscription {
   id: string;
   status: string;
-  current_period_start: number;
-  current_period_end: number;
-  cancel_at_period_end: boolean;
-  plan: {
+  current_period_start?: number | string;
+  current_period_end?: number | string;
+  cancel_at_period_end?: boolean;
+  plan?: {
     amount: number;
     currency: string;
     interval: string;
   };
+  // Additional fields that might come from your backend
+  subscription_id?: string;
+  user_id?: string;
+  price_id?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface Invoice {
@@ -37,7 +43,7 @@ interface Invoice {
 }
 
 const SubscriptionManagement: React.FC = () => {
-  const { user, token, updateUser } = useAuth();
+  const { user, token, setUser } = useAuth();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,16 +77,30 @@ const SubscriptionManagement: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('🔍 Success data received:', data);
+        
+        // Debug the subscription object structure
+        if (data.subscription) {
+          console.log('🔍 Subscription object:', data.subscription);
+          console.log('🔍 Subscription keys:', Object.keys(data.subscription));
+        }
+        
         setSubscription(data.subscription);
         setInvoices(data.invoices || []);
+        setError(null); // Clear any previous errors
       } else {
         const errorData = await response.json();
         console.error('🚨 Error response:', errorData);
-        setError(errorData.error || 'Failed to fetch subscription data');
+        setError(errorData.error || errorData.detail || 'Failed to fetch subscription data');
       }
     } catch (err) {
       console.error('🚨 Network error:', err);
-      setError('Network error while fetching subscription data');
+      const errorMessage = err instanceof Error ? err.message : 'Network error while fetching subscription data';
+      setError(errorMessage);
+      
+      // If it's a parsing error, it might be because the response format is unexpected
+      if (errorMessage.includes('JSON')) {
+        setError('Received invalid response format from server. Please contact support.');
+      }
     } finally {
       setLoading(false);
     }
@@ -160,15 +180,27 @@ const SubscriptionManagement: React.FC = () => {
     fetchSubscriptionData();
   }, [token, user?.id]);
 
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString('en-US', {
+  const formatDate = (timestamp: number | string | undefined) => {
+    if (!timestamp) return 'N/A';
+    
+    let date: Date;
+    if (typeof timestamp === 'string') {
+      date = new Date(timestamp);
+    } else {
+      date = new Date(timestamp * 1000);
+    }
+    
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
   };
 
-  const formatAmount = (amount: number, currency: string) => {
+  const formatAmount = (amount: number | undefined, currency: string = 'USD') => {
+    if (!amount) return '$0.00';
     return `$${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
   };
 
@@ -281,6 +313,14 @@ const SubscriptionManagement: React.FC = () => {
           {/* Subscription Details */}
           {subscription && (
             <div className="space-y-6">
+              {/* Debug Info (remove in production) */}
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-xs">
+                <strong>Debug Info:</strong> Subscription ID: {subscription.id || subscription.subscription_id || 'N/A'}, 
+                Status: {subscription.status || 'N/A'}, 
+                Period Start: {subscription.current_period_start || 'N/A'}, 
+                Period End: {subscription.current_period_end || 'N/A'}
+              </div>
+
               {/* Current Subscription */}
               <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
                 <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Current Subscription</h2>
@@ -305,7 +345,10 @@ const SubscriptionManagement: React.FC = () => {
                         <span className="font-medium">Amount</span>
                       </div>
                       <span className="text-white">
-                        {formatAmount(subscription.plan.amount, subscription.plan.currency)} / {subscription.plan.interval}
+                        {subscription.plan ? 
+                          `${formatAmount(subscription.plan.amount, subscription.plan.currency)} / ${subscription.plan.interval}` 
+                          : '$0.50 / month'
+                        }
                       </span>
                     </div>
                   </div>
@@ -317,7 +360,10 @@ const SubscriptionManagement: React.FC = () => {
                         <span className="font-medium">Current Period</span>
                       </div>
                       <span className="text-white text-sm">
-                        {formatDate(subscription.current_period_start)} - {formatDate(subscription.current_period_end)}
+                        {subscription.current_period_start && subscription.current_period_end
+                          ? `${formatDate(subscription.current_period_start)} - ${formatDate(subscription.current_period_end)}`
+                          : 'Active Subscription'
+                        }
                       </span>
                     </div>
 
