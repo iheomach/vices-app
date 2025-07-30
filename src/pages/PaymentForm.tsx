@@ -60,11 +60,12 @@ const PaymentForm: React.FC = () => {
     }
   };
 
-  const createSubscription = async (data: SubscriptionData): Promise<SubscriptionResponse> => {
+  const createSubscription = async (data: SubscriptionData, paymentMethodId: string): Promise<SubscriptionResponse> => {
     const apiUrl = process.env.REACT_APP_API_URL;
     console.log('Creating subscription...');
     console.log('API URL:', apiUrl);
     console.log('Subscription data:', data);
+    console.log('Payment method ID:', paymentMethodId);
 
     if (!apiUrl) {
       throw new Error('API URL not configured. Please check your environment variables.');
@@ -81,10 +82,16 @@ const PaymentForm: React.FC = () => {
         headers['Authorization'] = `Token ${token}`;
       }
 
+      // ✅ Add payment_method_id to the data
+      const subscriptionData = {
+        ...data,
+        payment_method_id: paymentMethodId
+      };
+
       const response = await fetch(`${apiUrl}/api/payments/create-subscription/`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(data),
+        body: JSON.stringify(subscriptionData),
       });
 
       console.log('Response status:', response.status);
@@ -132,16 +139,43 @@ const PaymentForm: React.FC = () => {
     setFormState(prev => ({ ...prev, loading: true, error: null, processing: true }));
 
     try {
-      const { client_secret, subscription_id } = await createSubscription(subscriptionData);
-
-      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            name: user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : 'Customer Name',
-            email: user?.email || '',
-          },
+      // ✅ Create payment method first
+      const { error: paymentMethodError, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+          name: user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : 'Customer Name',
+          email: user?.email || '',
         },
+      });
+
+      if (paymentMethodError) {
+        console.error('Payment method creation error:', paymentMethodError);
+        setFormState(prev => ({
+          ...prev,
+          error: paymentMethodError.message || 'Failed to create payment method',
+          loading: false,
+          processing: false,
+        }));
+        return;
+      }
+
+      if (!paymentMethod) {
+        setFormState(prev => ({
+          ...prev,
+          error: 'Failed to create payment method',
+          loading: false,
+          processing: false,
+        }));
+        return;
+      }
+
+      // ✅ Create subscription with payment method ID
+      const { client_secret, subscription_id } = await createSubscription(subscriptionData, paymentMethod.id);
+
+      // ✅ Confirm payment with the client secret
+      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
+        payment_method: paymentMethod.id,
       });
 
       if (error) {
