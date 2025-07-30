@@ -69,40 +69,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Check for existing token on app start
-  useEffect(() => {
-    // First, check localStorage (remember me was checked)
-    const savedToken = localStorage.getItem('authToken');
-    const savedUser = localStorage.getItem('userData');
-    
-    // Then check sessionStorage (remember me was not checked)
-    const sessionToken = sessionStorage.getItem('authToken');
-    const sessionUser = sessionStorage.getItem('userData');
-    
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-      setIsLoading(false);
-    } else if (sessionToken && sessionUser) {
-      setToken(sessionToken);
-      setUser(JSON.parse(sessionUser));
-      setIsLoading(false);
-    } else {
-      // No saved authentication
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Debug middleware to check authentication state changes
-  useEffect(() => {
-    console.log('Auth state changed:', {
-      isAuthenticated: !!user, 
-      user, 
-      token, 
-      isLoading 
-    });
-  }, [user, token, isLoading]);
-
+  // Function to validate token with server and fetch user profile
   const fetchUserProfile = async (authToken: string) => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile/`, {
@@ -122,17 +89,71 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           account_tier: userData.account_tier || currentUser.account_tier || 'free'
         };
         setUser(updatedUser);
+        setToken(authToken);
+        return true;
       } else {
-        // Token is invalid, logout
-        logout();
+        // Token is invalid, clear storage
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+        sessionStorage.removeItem('authToken');
+        sessionStorage.removeItem('userData');
+        setUser(null);
+        setToken(null);
+        return false;
       }
     } catch (error) {
       console.error('Failed to fetch user profile:', error);
-      logout();
-    } finally {
-      setIsLoading(false);
+      // Clear everything on network error
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userData');
+      sessionStorage.removeItem('authToken');
+      sessionStorage.removeItem('userData');
+      setUser(null);
+      setToken(null);
+      return false;
     }
   };
+
+  // Check for existing token on app start and validate it
+  useEffect(() => {
+    const validateExistingAuth = async () => {
+      setIsLoading(true);
+      
+      // Check localStorage first (remember me was checked)
+      const savedToken = localStorage.getItem('authToken');
+      
+      if (savedToken) {
+        const isValid = await fetchUserProfile(savedToken);
+        if (!isValid) {
+          // If localStorage token failed, check sessionStorage
+          const sessionToken = sessionStorage.getItem('authToken');
+          if (sessionToken) {
+            await fetchUserProfile(sessionToken);
+          }
+        }
+      } else {
+        // Check sessionStorage (remember me was not checked)
+        const sessionToken = sessionStorage.getItem('authToken');
+        if (sessionToken) {
+          await fetchUserProfile(sessionToken);
+        }
+      }
+      
+      setIsLoading(false);
+    };
+
+    validateExistingAuth();
+  }, []);
+
+  // Debug middleware to check authentication state changes
+  useEffect(() => {
+    console.log('Auth state changed:', {
+      isAuthenticated: !!user, 
+      user, 
+      token, 
+      isLoading 
+    });
+  }, [user, token, isLoading]);
 
   const register = async (userData: RegisterData) => {
     setIsLoading(true);

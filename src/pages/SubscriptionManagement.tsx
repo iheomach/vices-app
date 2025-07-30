@@ -15,15 +15,43 @@ import {
 
 interface Subscription {
   id: string;
+  object: string;
   status: string;
-  current_period_start?: number | string;
-  current_period_end?: number | string;
-  cancel_at_period_end?: boolean;
+  current_period_start: number;
+  current_period_end: number;
+  cancel_at_period_end: boolean;
+  created: number;
+  customer: string;
+  
+  // Items array containing subscription items with prices
+  items: {
+    object: string;
+    data: Array<{
+      id: string;
+      object: string;
+      price: {
+        id: string;
+        object: string;
+        active: boolean;
+        unit_amount: number;
+        currency: string;
+        recurring: {
+          interval: string;
+          interval_count: number;
+        };
+      };
+      quantity: number;
+    }>;
+  };
+  
+  // Legacy plan object (deprecated but still present)
   plan?: {
+    id: string;
     amount: number;
     currency: string;
     interval: string;
   };
+  
   // Additional fields that might come from your backend
   subscription_id?: string;
   user_id?: string;
@@ -83,6 +111,26 @@ const SubscriptionManagement: React.FC = () => {
         if (data.subscription) {
           console.log('🔍 Subscription object:', data.subscription);
           console.log('🔍 Subscription keys:', Object.keys(data.subscription));
+          
+          // Log the correct location of current_period_start/end
+          console.log('🔍 Current period start:', data.subscription.current_period_start);
+          console.log('🔍 Current period end:', data.subscription.current_period_end);
+          
+          // Log items structure
+          if (data.subscription.items) {
+            console.log('🔍 Items structure:', data.subscription.items);
+            if (data.subscription.items.data && data.subscription.items.data.length > 0) {
+              console.log('🔍 First item:', data.subscription.items.data[0]);
+              if (data.subscription.items.data[0].price) {
+                console.log('🔍 Price object:', data.subscription.items.data[0].price);
+              }
+            }
+          }
+          
+          // Log deprecated plan object if present
+          if (data.subscription.plan) {
+            console.log('🔍 Deprecated plan object:', data.subscription.plan);
+          }
         }
         
         setSubscription(data.subscription);
@@ -207,6 +255,7 @@ const SubscriptionManagement: React.FC = () => {
     if (typeof timestamp === 'string') {
       date = new Date(timestamp);
     } else {
+      // Stripe timestamps are in Unix timestamp format (seconds since epoch)
       date = new Date(timestamp * 1000);
     }
     
@@ -221,6 +270,7 @@ const SubscriptionManagement: React.FC = () => {
 
   const formatAmount = (amount: number | undefined, currency: string = 'USD') => {
     if (!amount) return '$0.00';
+    // Stripe amounts are in cents, so divide by 100
     return `$${(amount / 100).toFixed(2)} ${currency.toUpperCase()}`;
   };
 
@@ -374,9 +424,11 @@ const SubscriptionManagement: React.FC = () => {
                         <span className="font-medium">Amount</span>
                       </div>
                       <span className="text-white">
-                        {subscription.plan ? 
-                          `${formatAmount(subscription.plan.amount, subscription.plan.currency)} / ${subscription.plan.interval}` 
-                          : '$0.50 / month'
+                        {subscription.items?.data?.[0]?.price ? 
+                          `${formatAmount(subscription.items.data[0].price.unit_amount, subscription.items.data[0].price.currency)} / ${subscription.items.data[0].price.recurring.interval}` 
+                          : subscription.plan ? 
+                            `${formatAmount(subscription.plan.amount, subscription.plan.currency)} / ${subscription.plan.interval}` 
+                            : '$0.50 / month'
                         }
                       </span>
                     </div>
