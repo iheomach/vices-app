@@ -171,35 +171,37 @@ const PaymentForm: React.FC = () => {
       }
 
       // ✅ Create subscription with payment method ID
-      const { client_secret, subscription_id } = await createSubscription(subscriptionData, paymentMethod.id);
+      // ✅ Create subscription with payment method ID
+  const { client_secret, subscription_id, status } = await createSubscription(subscriptionData, paymentMethod.id);
 
-      // ✅ Confirm payment with the client secret
-      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
-        payment_method: paymentMethod.id,
-      });
+  // ✅ For subscriptions, confirm the setup intent (not payment intent)
+  const { error } = await stripe.confirmCardPayment(client_secret, {
+    payment_method: paymentMethod.id,
+  });
 
-      if (error) {
-        console.error('Subscription payment error:', error);
-        setFormState(prev => ({
-          ...prev,
-          error: error.message || 'Subscription setup failed',
-          loading: false,
-          processing: false,
-        }));
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        console.log('Subscription payment successful:', paymentIntent);
-        console.log('Subscription ID:', subscription_id);
-        
-        // Upgrade user to premium after successful subscription setup
-        await upgradeUserToPremium();
-        
-        setFormState(prev => ({
-          ...prev,
-          success: true,
-          loading: false,
-          processing: false,
-        }));
-      }
+  if (error) {
+    console.error('Subscription setup error:', error);
+    setFormState(prev => ({
+      ...prev,
+      error: error.message || 'Subscription setup failed',
+      loading: false,
+      processing: false,
+    }));
+  } else {
+    console.log('Subscription setup successful!');
+    console.log('Subscription ID:', subscription_id);
+    console.log('Subscription Status:', status);
+    
+    // Upgrade user to premium after successful subscription setup
+    await upgradeUserToPremium();
+    
+    setFormState(prev => ({
+      ...prev,
+      success: true,
+      loading: false,
+      processing: false,
+    }));
+  }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Payment failed. Please try again.';
       setFormState(prev => ({
