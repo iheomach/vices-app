@@ -21,7 +21,7 @@ interface PaymentFormState {
 const PaymentForm: React.FC = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { user, updateUser, token } = useAuth(); // ✅ Get token at component level
+  const { user, updateUser, setUser, token } = useAuth(); // ✅ Get setUser function
 
   // Debug: Check environment variables
   console.log('Environment check:', {
@@ -80,11 +80,11 @@ const PaymentForm: React.FC = () => {
 
       const updatedUser = await response.json();
       console.log('User successfully upgraded to premium!', updatedUser);
+      console.log('Updating user context with account_tier:', updatedUser.account_tier);
       
-      // Update the user context with the new data
-      if (updateUser) {
-        await updateUser(updatedUser);
-      }
+      // Directly update the user context with the new data
+      setUser(updatedUser);
+      console.log('User context updated successfully');
       
     } catch (error) {
       console.error('Error upgrading user to premium:', error);

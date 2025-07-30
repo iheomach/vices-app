@@ -53,6 +53,7 @@ interface AuthContextType {
   register: (userData: RegisterData) => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
+  setUser: (user: User) => void;
   isLoading: boolean;
   isAuthenticated: boolean;
   isVerified: boolean;
@@ -355,6 +356,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
   };
 
+  // Helper function to update user and persist to storage
+  const updateUserDirectly = (updatedUser: User) => {
+    setUser(updatedUser);
+    
+    // Update stored user data in localStorage/sessionStorage
+    const currentStoredToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+    if (currentStoredToken) {
+      if (localStorage.getItem('authToken')) {
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+      } else {
+        sessionStorage.setItem('userData', JSON.stringify(updatedUser));
+      }
+    }
+  };
+
   const value = {
     user,
     token,
@@ -362,6 +378,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     register,
     logout,
     updateUser,
+    setUser: updateUserDirectly,
     isLoading,
     isAuthenticated: !!user,
     isVerified: user?.is_verified || false,

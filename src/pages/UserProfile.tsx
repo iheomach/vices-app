@@ -384,7 +384,16 @@ const ProfilePage: React.FC = () => {
             <div className="space-y-6">
               {/* Account Type Display */}
               <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
-                <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Account Information</h2>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-semibold text-[#7CC379]">Account Information</h2>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="flex items-center space-x-2 bg-[#7CC379]/20 text-[#7CC379] px-4 py-2 rounded-lg hover:bg-[#7CC379]/30 transition-all"
+                  >
+                    <Settings className="w-4 h-4" />
+                    <span>Refresh</span>
+                  </button>
+                </div>
                 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-black/30 rounded-lg">
