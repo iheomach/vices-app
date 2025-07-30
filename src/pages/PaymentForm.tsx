@@ -171,38 +171,49 @@ const PaymentForm: React.FC = () => {
       }
 
       // ✅ Create subscription with payment method ID
-      // ✅ Create subscription with payment method ID
-  const { client_secret, subscription_id, status } = await createSubscription(subscriptionData, paymentMethod.id);
+      const { client_secret, subscription_id, status } = await createSubscription(subscriptionData, paymentMethod.id);
 
-  // ✅ For subscriptions, confirm the setup intent (not payment intent)
-  const { error } = await stripe.confirmCardPayment(client_secret, {
-    payment_method: paymentMethod.id,
-  });
+      console.log('Subscription response:', { client_secret, subscription_id, status });
 
-  if (error) {
-    console.error('Subscription setup error:', error);
-    setFormState(prev => ({
-      ...prev,
-      error: error.message || 'Subscription setup failed',
-      loading: false,
-      processing: false,
-    }));
-  } else {
-    console.log('Subscription setup successful!');
-    console.log('Subscription ID:', subscription_id);
-    console.log('Subscription Status:', status);
-    
-    // Upgrade user to premium after successful subscription setup
-    await upgradeUserToPremium();
-    
-    setFormState(prev => ({
-      ...prev,
-      success: true,
-      loading: false,
-      processing: false,
-    }));
-  }
+      // ✅ Only confirm payment if client_secret exists (for incomplete subscriptions)
+      if (client_secret) {
+        console.log('Confirming payment with client_secret...');
+        const { error } = await stripe.confirmCardPayment(client_secret, {
+          payment_method: paymentMethod.id,
+        });
+
+        if (error) {
+          console.error('Subscription payment confirmation error:', error);
+          setFormState(prev => ({
+            ...prev,
+            error: error.message || 'Subscription payment failed',
+            loading: false,
+            processing: false,
+          }));
+          return;
+        }
+        console.log('Payment confirmed successfully!');
+      } else {
+        // ✅ No client_secret means subscription was charged immediately
+        console.log('Subscription was charged immediately, no payment confirmation needed');
+      }
+
+      console.log('Subscription created successfully!');
+      console.log('Subscription ID:', subscription_id);
+      console.log('Subscription Status:', status);
+      
+      // Upgrade user to premium after successful subscription setup
+      await upgradeUserToPremium();
+      
+      setFormState(prev => ({
+        ...prev,
+        success: true,
+        loading: false,
+        processing: false,
+      }));
+
     } catch (err) {
+      console.error('Subscription error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Payment failed. Please try again.';
       setFormState(prev => ({
         ...prev,
@@ -247,7 +258,7 @@ const PaymentForm: React.FC = () => {
               <p className="text-green-100/80 mb-2">Thank you for subscribing to Premium.</p>
               <p className="text-[#7CC379] font-semibold mb-4">Welcome to Premium!</p>
               <p className="text-green-100/70 text-sm mb-2">Your monthly subscription is now active and you have access to all premium features.</p>
-              <p className="text-green-100/60 text-xs mb-4">You'll be charged $9.99 monthly. Cancel anytime from your account settings.</p>
+              <p className="text-green-100/60 text-xs mb-4">You'll be charged $0.50 monthly. Cancel anytime from your account settings.</p>
               <a href="/user-dashboard" className="inline-block mt-4 px-6 py-2 bg-[#7CC379] text-black rounded-lg font-semibold hover:bg-[#5a9556] transition">Go to Dashboard</a>
             </div>
           </div>
@@ -275,7 +286,7 @@ const PaymentForm: React.FC = () => {
             <div className="mb-4">
               <label className="block text-green-100/80 font-medium mb-1">Monthly Subscription</label>
               <div className="w-full px-4 py-2 rounded-lg border border-[#7CC379]/30 bg-white/10 text-white">
-                $9.99 USD / month
+                $0.50 USD / month
               </div>
               <p className="text-green-100/60 text-sm mt-1">Cancel anytime from your account settings</p>
             </div>
@@ -305,7 +316,7 @@ const PaymentForm: React.FC = () => {
               </>
               ) : (
               <>
-                <span>Subscribe for $9.99/month</span>
+                <span>Subscribe for $0.50/month</span>
               </>
               )}
             </button>
