@@ -51,12 +51,44 @@ const PaymentForm: React.FC = () => {
     try {
       console.log('Upgrading user to premium...');
       
-      // Update the user's account tier directly using AuthContext
-      await updateUser({ account_tier: 'premium' });
+      const apiUrl = process.env.REACT_APP_API_URL;
+      if (!apiUrl) {
+        throw new Error('API URL not configured');
+      }
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
       
-      console.log('User successfully upgraded to premium!');
+      if (token) {
+        headers['Authorization'] = `Token ${token}`;
+      }
+
+      const response = await fetch(`${apiUrl}/api/users/upgrade-to-premium/`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          user_id: user.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to upgrade user:', errorText);
+        throw new Error(`Failed to upgrade user: ${errorText}`);
+      }
+
+      const updatedUser = await response.json();
+      console.log('User successfully upgraded to premium!', updatedUser);
+      
+      // Update the user context with the new data
+      if (updateUser) {
+        await updateUser(updatedUser);
+      }
+      
     } catch (error) {
       console.error('Error upgrading user to premium:', error);
+      throw error; // Re-throw to handle in the main flow
     }
   };
 
