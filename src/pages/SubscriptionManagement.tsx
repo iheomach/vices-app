@@ -57,6 +57,7 @@ const SubscriptionManagement: React.FC = () => {
 
     try {
       setLoading(true);
+      setError(null); // Clear previous errors
       
       // Debug logging
       console.log('🔍 Fetching subscription data for user:', {
@@ -87,20 +88,39 @@ const SubscriptionManagement: React.FC = () => {
         setSubscription(data.subscription);
         setInvoices(data.invoices || []);
         setError(null); // Clear any previous errors
+      } else if (response.status === 404) {
+        // Endpoint doesn't exist yet - this is expected for your setup
+        console.log('🔍 Subscription endpoint not found - using premium account status');
+        setError(null); // Don't show error for 404, just show premium account section
+        setSubscription(null);
+        setInvoices([]);
+      } else if (response.status === 500) {
+        // Server error - likely the endpoint exists but has issues
+        console.log('🔍 Server error on subscription endpoint');
+        setError('Subscription management is temporarily unavailable. Your premium status is still active.');
+        setSubscription(null);
+        setInvoices([]);
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         console.error('🚨 Error response:', errorData);
         setError(errorData.error || errorData.detail || 'Failed to fetch subscription data');
       }
     } catch (err) {
       console.error('🚨 Network error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Network error while fetching subscription data';
-      setError(errorMessage);
       
-      // If it's a parsing error, it might be because the response format is unexpected
-      if (errorMessage.includes('JSON')) {
-        setError('Received invalid response format from server. Please contact support.');
+      // Handle different types of errors
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        setError('Unable to connect to subscription service. Please check your internet connection.');
+      } else if (err instanceof SyntaxError) {
+        setError('Received invalid response from server. Subscription management is temporarily unavailable.');
+      } else {
+        const errorMessage = err instanceof Error ? err.message : 'Network error while fetching subscription data';
+        setError(errorMessage);
       }
+      
+      // Don't show subscription data if there's an error
+      setSubscription(null);
+      setInvoices([]);
     } finally {
       setLoading(false);
     }
@@ -266,9 +286,17 @@ const SubscriptionManagement: React.FC = () => {
           </div>
 
           {/* Error/Success Messages */}
-          {error && (
+          {error && !error.includes('temporarily unavailable') && (
             <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300">
               {error}
+            </div>
+          )}
+          {error && error.includes('temporarily unavailable') && (
+            <div className="mb-6 p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-yellow-300">
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="w-5 h-5" />
+                <span>{error}</span>
+              </div>
             </div>
           )}
           {success && (
@@ -300,27 +328,28 @@ const SubscriptionManagement: React.FC = () => {
                 <h2 className="text-2xl font-semibold text-[#7CC379]">Premium Account</h2>
               </div>
               <p className="text-gray-300 mb-4">
-                You have a premium account that was activated through a one-time payment or special promotion.
+                You have a premium account! Your subscription is active and all premium features are available.
               </p>
               <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
                 <p className="text-green-300">
-                  <strong>Status:</strong> Premium (Lifetime/Special)
+                  <strong>Status:</strong> Premium Active
+                </p>
+                <p className="text-green-300 text-sm mt-2">
+                  Your premium subscription is managed through our payment system. All features are unlocked!
                 </p>
               </div>
+              
+              {error && error.includes('temporarily unavailable') && (
+                <div className="mt-4 p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-300 text-sm">
+                  <strong>Note:</strong> Detailed subscription management is being set up. Your premium access continues normally.
+                </div>
+              )}
             </div>
           )}
 
           {/* Subscription Details */}
           {subscription && (
             <div className="space-y-6">
-              {/* Debug Info (remove in production) */}
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-xs">
-                <strong>Debug Info:</strong> Subscription ID: {subscription.id || subscription.subscription_id || 'N/A'}, 
-                Status: {subscription.status || 'N/A'}, 
-                Period Start: {subscription.current_period_start || 'N/A'}, 
-                Period End: {subscription.current_period_end || 'N/A'}
-              </div>
-
               {/* Current Subscription */}
               <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-[#7CC379]/20">
                 <h2 className="text-2xl font-semibold text-[#7CC379] mb-6">Current Subscription</h2>

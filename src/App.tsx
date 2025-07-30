@@ -11,10 +11,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ViceJourneyTracker from './pages/ViceJourneyTracker';
 import SubscriptionManagement from './pages/SubscriptionManagement';
 import './index.css'; // or wherever your global styles are
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY!);
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import PaymentForm from './pages/PaymentForm';
+
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY!);
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ContactUsPage from './pages/ContactUsPage';
 import AboutUsPage from './pages/AboutUsPage';
