@@ -12,8 +12,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   // Show a loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-gray-900">
-        <div className="animate-pulse text-green-500 text-xl font-semibold">
+      <div className="min-h-screen flex justify-center items-center bg-[#1B272C]">
+        <div className="animate-pulse text-[#7CC379] text-xl font-semibold">
           Loading...
         </div>
       </div>
