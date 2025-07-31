@@ -652,6 +652,23 @@ const VicesLandingPage: React.FC = () => {
               color: "border-[#7CC379] ring-2 ring-[#7CC379]/50",
               buttonColor: "bg-gradient-to-r from-[#7CC379] to-[#5a9556]",
               popular: true
+              },
+              {
+              name: "Premium",
+              price: "$9.99",
+              period: "per month",
+              features: [
+                "Unlimited journal entries",
+                "Advanced tracking & analytics",
+                "Multiple goals & challenges",
+                "Detailed AI insights & recommendations",
+                "Data export (json)",
+                "Priority support",
+                "Ad-free experience"
+              ],
+              color: "border-[#7CC379] ring-2 ring-[#7CC379]/50",
+              buttonColor: "bg-gradient-to-r from-[#7CC379] to-[#5a9556]",
+              popular: true
               }
             ].map((plan, index) => (
               <div key={index} className={`relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 ${plan.color} rounded-2xl p-8 flex flex-col`}>
@@ -689,7 +706,7 @@ const VicesLandingPage: React.FC = () => {
                   }
                 }}
                 >
-                {plan.name === "Free" ? "Start Free" : "Begin Wellness Journey"}
+                {plan.name === "Free" ? "Start Free" : "Activate Premium Plan"}
                 </button>
               </div>
               </div>
