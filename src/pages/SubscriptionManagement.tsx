@@ -428,7 +428,7 @@ const SubscriptionManagement: React.FC = () => {
                           `${formatAmount(subscription.items.data[0].price.unit_amount, subscription.items.data[0].price.currency)} / ${subscription.items.data[0].price.recurring.interval}` 
                           : subscription.plan ? 
                             `${formatAmount(subscription.plan.amount, subscription.plan.currency)} / ${subscription.plan.interval}` 
-                            : '$0.50 / month'
+                            : '$9.99 / month'
                         }
                       </span>
                     </div>

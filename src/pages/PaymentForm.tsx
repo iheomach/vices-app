@@ -37,7 +37,7 @@ const PaymentForm: React.FC = () => {
   });
 
   const [subscriptionData] = useState({
-    price_id: 'price_1RqN4fKrgfp4oNY3kDtd7Cvs', // Replace with the price ID from Stripe Dashboard
+    price_id: 'price_1RqLpiKrgfp4oNY3JNpnoP8x', // Replace with the price ID from Stripe Dashboard
     user_id: user?.id || 'guest',
     email: user?.email || '',
   });
@@ -290,7 +290,7 @@ const PaymentForm: React.FC = () => {
               <p className="text-green-100/80 mb-2">Thank you for subscribing to Premium.</p>
               <p className="text-[#7CC379] font-semibold mb-4">Welcome to Premium!</p>
               <p className="text-green-100/70 text-sm mb-2">Your monthly subscription is now active and you have access to all premium features.</p>
-              <p className="text-green-100/60 text-xs mb-4">You'll be charged $0.50 monthly. Cancel anytime from your account settings.</p>
+              <p className="text-green-100/60 text-xs mb-4">You'll be charged $9.99 monthly. Cancel anytime from your account settings.</p>
               <a href="/user-dashboard" className="inline-block mt-4 px-6 py-2 bg-[#7CC379] text-black rounded-lg font-semibold hover:bg-[#5a9556] transition">Go to Dashboard</a>
             </div>
           </div>
@@ -318,7 +318,7 @@ const PaymentForm: React.FC = () => {
             <div className="mb-4">
               <label className="block text-green-100/80 font-medium mb-1">Monthly Subscription</label>
               <div className="w-full px-4 py-2 rounded-lg border border-[#7CC379]/30 bg-white/10 text-white">
-                $0.50 USD / month
+                $9.99 USD / month
               </div>
               <p className="text-green-100/60 text-sm mt-1">Cancel anytime from your account settings</p>
             </div>
@@ -348,7 +348,7 @@ const PaymentForm: React.FC = () => {
               </>
               ) : (
               <>
-                <span>Subscribe for $0.50/month</span>
+                <span>Subscribe for $9.99/month</span>
               </>
               )}
             </button>

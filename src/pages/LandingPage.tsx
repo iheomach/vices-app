@@ -80,7 +80,7 @@ const VicesLandingPage: React.FC = () => {
         </div>
       </div>
       <h2 className="text-sm mb-1">Good evening, Iheoma!</h2>
-      <p className="text-slate-400 mb-4 text-xs">Track your wellness journey</p>
+      <p className="text-slate-400 mb-4 text-xs">Track your addiciton management journey</p>
       <div className="grid grid-cols-2 gap-2 mb-3">
         <div className="bg-slate-800 p-2 rounded">
           <div className="text-xs text-slate-400">Mood</div>
@@ -391,15 +391,15 @@ const VicesLandingPage: React.FC = () => {
             className="text-2xl md:text-3xl font-bold mb-6 text-white"
             style={{ transform: `translateY(${scrollY * 0.3}px)` }}
           >
-            AI-Powered Wellness Platform
+            AI-Powered Addiction Management Web App
           </h2>
           
           <p 
             className="text-xl md:text-2xl text-green-100/80 mb-10 max-w-4xl mx-auto leading-relaxed"
             style={{ transform: `translateY(${scrollY * 0.4}px)` }}
           >
-            Transform your relationship with cannabis and alcohol through intelligent tracking, AI insights, and personalized optimization. 
-            The complete wellness platform for mindful consumption.
+            Transform your relationship with cannabis and alcohol through intelligent tracking, AI insights, and personalized recovery support. 
+            The complete addiction management platform for sustainable recovery.
           </p>
           
           {/* Feature Buttons */}
@@ -415,10 +415,10 @@ const VicesLandingPage: React.FC = () => {
             </button>
             
             <button 
-              onClick={() => scrollToSection('wellness')}
+              onClick={() => scrollToSection('recovery')}
               className="border-2 border-[#7CC379] text-white px-6 py-4 rounded-xl text-lg font-semibold hover:bg-[#7CC379]/20 transition-all flex items-center justify-center space-x-2"
             >
-              <span>Wellness Tools</span>
+              <span>Addiction Management Tools</span>
             </button>
 
 
@@ -436,10 +436,10 @@ const VicesLandingPage: React.FC = () => {
       <section id="features" className="py-20 px-6 bg-black/20">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-[#7CC379]">
-            Complete Wellness Platform
+            Complete Addiction Management System
           </h2>
           <p className="text-xl text-center text-green-100/70 mb-16 max-w-3xl mx-auto">
-            From tracking to optimization, VICES provides everything you need for a mindful and healthy relationship with substances
+            From tracking to recovery, VICES provides everything you need for comprehensive addiction management and sustainable sobriety
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -447,37 +447,37 @@ const VicesLandingPage: React.FC = () => {
               {
                 icon: <Brain className="w-8 h-8" />,
                 title: "AI Journey Tracker",
-                description: "Track consumption, analyze patterns, and get personalized insights with our advanced AI system. Set goals, join challenges, and optimize your experience.",
+                description: "Track recovery progress, analyze patterns, and get personalized insights with our advanced AI system. Set sobriety goals, join support challenges, and manage your addiction recovery.",
                 color: "from-[#7CC379] to-[#5a9556]"
               },
               {
-                icon: <Target className="w-8 h-8" />,
-                title: "Wellness Optimization",
-                description: "AI-powered recommendations for dosage, timing, and substance selection based on your goals, tolerance, and lifestyle patterns.",
+                icon: <Calendar className="w-8 h-8" />,
+                title: "Daily Journal System",
+                description: "Comprehensive logging for substances, mood, sleep, and wellness metrics with smart autocomplete and pattern recognition.",
                 color: "from-blue-500 to-blue-600"
               },
               {
-                icon: <Zap className="w-8 h-8" />,
-                title: "Smart Insights",
-                description: "Advanced analytics reveal consumption patterns, health correlations, and optimization opportunities unique to your journey.",
+                icon: <Target className="w-8 h-8" />,
+                title: "Goals & Challenges",
+                description: "Join structured recovery challenges, set personal sobriety goals, and track progress with gamified experiences and community support.",
                 color: "from-purple-500 to-purple-600"
               },
               {
+                icon: <Zap className="w-8 h-8" />,
+                title: "AI Insights & Analysis",
+                description: "Advanced analytics reveal addiction patterns, trigger identification, and recovery support opportunities unique to your journey.",
+                color: "from-orange-500 to-orange-600"
+              },
+              {
                 icon: <Shield className="w-8 h-8" />,
-                title: "Health & Safety",
-                description: "Comprehensive safety monitoring, interaction warnings, tolerance management, and educational resources for responsible use.",
+                title: "Secure User Management",
+                description: "Complete profile management, data export, privacy controls, and secure authentication with 2FA email verification.",
                 color: "from-red-500 to-red-600"
               },
               {
                 icon: <Users className="w-8 h-8" />,
-                title: "Community Support",
-                description: "Connect with like-minded individuals, join wellness challenges, and get support through anonymous communities and peer networks.",
-                color: "from-orange-500 to-orange-600"
-              },
-              {
-                icon: <BarChart3 className="w-8 h-8" />,
-                title: "Premium Analytics",
-                description: "Deep health insights, biometric integration, predictive modeling, and comprehensive wellness reports with premium features.",
+                title: "Premium Subscriptions",
+                description: "Stripe-powered payment system with automatic tier upgrades, billing management, and premium feature access.",
                 color: "from-emerald-500 to-emerald-600"
               }
             ].map((feature, index) => (
@@ -505,7 +505,7 @@ const VicesLandingPage: React.FC = () => {
               AI Vice Journey Tracker
             </h2>
             <p className="text-xl text-green-100/70 max-w-3xl mx-auto">
-              Our flagship feature that transforms how you understand and optimize your consumption patterns
+              Our flagship feature that transforms how you understand and manage your addiction recovery journey
             </p>
           </div>
           
@@ -518,7 +518,7 @@ const VicesLandingPage: React.FC = () => {
                   <h3 className="text-xl font-semibold text-white">Daily Journal</h3>
                 </div>
                 <p className="text-green-100/70">
-                  Log consumption, mood, effects, and sleep quality in under 2 minutes. Our smart interface learns your patterns.
+                  Log usage, mood, triggers, and recovery milestones in under 2 minutes. Our smart interface learns your addiction patterns.
                 </p>
               </div>
               {/* Screenshot placeholder */}
@@ -534,7 +534,7 @@ const VicesLandingPage: React.FC = () => {
                   <h3 className="text-xl font-semibold text-white">AI Insights</h3>
                 </div>
                 <p className="text-green-100/70">
-                  Advanced algorithms analyze your data to identify patterns, optimize dosages, and predict ideal timing.
+                  Advanced algorithms analyze your data to identify addiction patterns, predict triggers, and recommend recovery strategies.
                 </p>
               </div>
               {/* Screenshot placeholder */}
@@ -550,7 +550,7 @@ const VicesLandingPage: React.FC = () => {
                   <h3 className="text-xl font-semibold text-white">Goals & Challenges</h3>
                 </div>
                 <p className="text-green-100/70">
-                  Join community challenges like T-breaks, set personal goals, and track progress with gamified experiences.
+                  Join recovery challenges like sober streaks, set sobriety goals, and track progress with gamified addiction management experiences.
                 </p>
               </div>
               {/* Screenshot placeholder */}
@@ -562,39 +562,39 @@ const VicesLandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Wellness & Optimization Platform */}
-      <section id="wellness" className="py-20 px-6 bg-black/20">
+      {/* Addiction Management & Recovery Platform */}
+      <section id="recovery" className="py-20 px-6 bg-black/20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#7CC379]">
-              Wellness-First Approach
+              Recovery-First Approach
             </h2>
             <p className="text-xl text-green-100/70 max-w-3xl mx-auto">
-              Every feature is designed to promote mindful consumption and optimize your health and wellbeing
+              Every feature is designed to support sustainable recovery and enhance your addiction management journey
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                title: "Mood Optimization",
-                description: "AI recommendations for achieving desired mental states safely",
+                title: "Smart Journaling",
+                description: "Intelligent forms with autocomplete and pattern recognition for quick addiction tracking",
+                icon: "📝"
+              },
+              {
+                title: "AI Pattern Analysis",
+                description: "GPT-3.5 powered insights that identify triggers and recovery patterns",
                 icon: "🧠"
               },
               {
-                title: "Tolerance Management",
-                description: "Smart tracking and planning for healthy tolerance levels",
-                icon: "📈"
+                title: "Goal Achievement",
+                description: "Structured challenges and custom goals with progress tracking and rewards",
+                icon: "🎯"
               },
               {
-                title: "Health Monitoring",
-                description: "Track correlations between consumption and wellbeing",
-                icon: "❤️"
-              },
-              {
-                title: "Mindful Consumption",
-                description: "Tools and techniques for conscious, intentional use",
-                icon: "🧘"
+                title: "Secure Data Management",
+                description: "Full data ownership with export capabilities and privacy-first design",
+                icon: "🔒"
               }
             ].map((feature, index) => (
               <div key={index} className="bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border border-[#7CC379]/20 rounded-xl p-6 text-center hover:scale-105 transition-all">
@@ -607,26 +607,102 @@ const VicesLandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Digital Bodyguard Feature Highlight */}
+      <section className="py-20 px-6 bg-gradient-to-r from-purple-900/20 to-indigo-900/20 border-t border-purple-500/20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center space-x-2 bg-purple-600/20 border border-purple-500/30 rounded-full px-4 py-2 mb-6">
+              <Shield className="w-5 h-5 text-purple-400" />
+              <span className="text-purple-300 font-semibold">Coming Soon - Mobile App Only</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-purple-400">
+              Digital Bodyguard
+            </h2>
+            <p className="text-xl text-purple-100/70 max-w-3xl mx-auto">
+              Revolutionary AI-powered crisis prevention system specifically designed for opioid users. Monitors your patterns 24/7 to predict and prevent dangerous overdose episodes before they happen, providing life-saving interventions when you need them most.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                title: "24/7 AI Monitoring",
+                description: "Continuous pattern analysis and risk assessment without user intervention",
+                icon: "🤖"
+              },
+              {
+                title: "Crisis Prediction",
+                description: "Advanced algorithms predict high-risk overdose periods up to 48 hours in advance for opioid users",
+                icon: "🔮"
+              },
+              {
+                title: "Emergency Response",
+                description: "Automatic emergency contact alerts with location sharing during overdose crisis for immediate help",
+                icon: "🚨"
+              },
+              {
+                title: "Graduated Intervention",
+                description: "Smart escalation from gentle nudges to emergency professional services",
+                icon: "📈"
+              }
+            ].map((feature, index) => (
+              <div key={index} className="bg-gradient-to-br from-purple-900/40 to-indigo-900/20 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6 text-center hover:scale-105 transition-all">
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-lg font-semibold mb-3 text-purple-300">{feature.title}</h3>
+                <p className="text-purple-100/70 text-sm">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <div className="bg-gradient-to-r from-purple-900/40 to-indigo-900/40 backdrop-blur-sm border border-purple-500/30 rounded-xl p-8 max-w-3xl mx-auto">
+              <h3 className="text-2xl font-bold mb-4 text-purple-300">
+                Pro Tier - $15.99/month
+              </h3>
+              <p className="text-purple-100/70 mb-6">
+                Digital Bodyguard is exclusively available in our upcoming mobile app as part of the Pro tier, specifically designed for opioid users at high risk of overdose. 
+                This life-saving technology requires mobile-specific features like push notifications, location services, 
+                and always-on monitoring for optimal crisis prevention and emergency response during critical moments.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button 
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-xl hover:shadow-purple-500/25 transition-all opacity-75 cursor-not-allowed"
+                  disabled
+                >
+                  Mobile App Coming Soon
+                </button>
+                <button 
+                  onClick={() => navigate('/usersignup')}
+                  className="border-2 border-purple-500 text-purple-300 px-6 py-3 rounded-lg font-semibold hover:bg-purple-500/10 transition-all"
+                >
+                  Join Waitlist
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#7CC379]">
-              Wellness Investment Plans
+              Recovery Investment Plans
             </h2>
             <p className="text-xl text-green-100/70 max-w-3xl mx-auto">
-              Invest in your wellness journey with plans designed for every level of commitment
+              Invest in your recovery journey with plans designed for every level of commitment
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-8xl mx-auto">
             {[
               {
               name: "Free",
               price: "$0",
               period: "forever",
               features: [
-                "Basic journal tracking (5 entries/month)",
+                "5 journal entries/month",
                 "Simple mood & sleep logging",
                 "Basic dashboard overview",
                 "One active goal at a time",
@@ -644,34 +720,33 @@ const VicesLandingPage: React.FC = () => {
                 "Unlimited journal entries",
                 "Advanced tracking & analytics",
                 "Multiple goals & challenges",
-                "Detailed AI insights & recommendations",
-                "Data export (json)",
-                "Priority support",
-                "Ad-free experience"
+                "Detailed AI insights",
+                "Data export (JSON)",
               ],
               color: "border-[#7CC379] ring-2 ring-[#7CC379]/50",
               buttonColor: "bg-gradient-to-r from-[#7CC379] to-[#5a9556]",
               popular: true
               },
               {
-              name: "Premium",
-              price: "$9.99",
+              name: "Pro",
+              price: "$15.99",
               period: "per month",
+              subtitle: "Mobile App Only - Coming Soon",
               features: [
-                "Unlimited journal entries",
-                "Advanced tracking & analytics",
-                "Multiple goals & challenges",
-                "Detailed AI insights & recommendations",
-                "Data export (json)",
-                "Priority support",
-                "Ad-free experience"
+                "Everything in Premium, plus:",
+                "Digital Bodyguard Crisis Prevention",
+                "24/7 Mobile Monitoring",
+                "Real-time Risk Assessment",
+                "Emergency Contact Integration",
+                "Predictive Relapse Prevention",
+                "Advanced AI Pattern Recognition"
               ],
-              color: "border-[#7CC379] ring-2 ring-[#7CC379]/50",
-              buttonColor: "bg-gradient-to-r from-[#7CC379] to-[#5a9556]",
-              popular: true
+              color: "border-purple-500 ring-2 ring-purple-500/50",
+              buttonColor: "bg-gradient-to-r from-purple-600 to-purple-700",
+              comingSoon: true
               }
             ].map((plan, index) => (
-              <div key={index} className={`relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 ${plan.color} rounded-2xl p-8 flex flex-col`}>
+              <div key={index} className={`relative bg-gradient-to-br from-black/40 to-black/20 backdrop-blur-sm border-2 ${plan.color} rounded-2xl p-10 flex flex-col`}>
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <span className="bg-[#7CC379] text-white px-4 py-1 rounded-full text-sm font-semibold">
@@ -680,8 +755,19 @@ const VicesLandingPage: React.FC = () => {
                 </div>
               )}
               
+              {plan.comingSoon && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span className="bg-purple-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                  Coming Soon
+                </span>
+                </div>
+              )}
+              
               <div className="text-center flex-1 flex flex-col">
                 <h3 className="text-2xl font-bold mb-2 text-white">{plan.name}</h3>
+                {plan.subtitle && (
+                  <p className="text-sm text-purple-300 mb-2">{plan.subtitle}</p>
+                )}
                 <div className="mb-6">
                 <span className="text-4xl font-bold text-[#7CC379]">{plan.price}</span>
                 <span className="text-green-100/60">/{plan.period}</span>
@@ -697,16 +783,22 @@ const VicesLandingPage: React.FC = () => {
                 </ul>
                 
                 <button
-                className={`w-full py-3 rounded-lg font-semibold transition-all mt-auto ${plan.buttonColor}`}
+                className={`w-full py-3 rounded-lg font-semibold transition-all mt-auto ${plan.buttonColor} ${plan.comingSoon ? 'opacity-75 cursor-not-allowed' : ''}`}
                 onClick={() => {
+                  if (plan.comingSoon) {
+                    // Do nothing for coming soon
+                    return;
+                  }
                   if (plan.name === "Premium") {
-                  navigate('/payment');
+                    navigate('/payment');
                   } else {
-                  navigate('/usersignup');
+                    navigate('/usersignup');
                   }
                 }}
+                disabled={plan.comingSoon}
                 >
-                {plan.name === "Free" ? "Start Free" : "Activate Premium Plan"}
+                {plan.comingSoon ? "Download Mobile App" : 
+                 plan.name === "Free" ? "Start Free" : "Activate Premium Plan"}
                 </button>
               </div>
               </div>
@@ -719,11 +811,11 @@ const VicesLandingPage: React.FC = () => {
       <section className="py-20 px-6 text-center bg-gradient-to-r from-[#1B272C] to-[#203a43]">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold mb-8 text-[#7CC379]">
-            Transform Your Relationship with Substances
+            Break Free from Addiction
           </h2>
           
           <p className="text-xl text-green-100/80 mb-10">
-            Join thousands of users who are building healthier, more mindful relationships with cannabis and alcohol through AI-powered wellness insights
+            Join a community of users who are building healthier, more mindful relationships with cannabis and alcohol through AI-powered addiction management insights
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -731,7 +823,7 @@ const VicesLandingPage: React.FC = () => {
               onClick={() => navigate('/login')}
               className="bg-gradient-to-r from-[#7CC379] to-[#5a9556] text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl hover:shadow-[#7CC379]/40 hover:-translate-y-2 transition-all"
             >
-              🌱 Start Your Wellness Journey
+              Start Your Recovery Journey
             </button>
 
           </div>
@@ -747,7 +839,7 @@ const VicesLandingPage: React.FC = () => {
                 VICES
               </h3>
               <p className="text-green-100/60 leading-relaxed max-w-xl mx-auto">
-                The AI-powered wellness platform for mindful cannabis and alcohol consumption. 
+                The AI-powered addiction management platform for cannabis and alcohol recovery. 
                 Build healthier habits through intelligent tracking and personalized insights.
               </p>
             </div>
@@ -761,7 +853,7 @@ const VicesLandingPage: React.FC = () => {
           </div>
           <div className="border-t border-[#7CC379]/20 pt-6 text-center">
             <p className="text-green-100/50">
-              &copy; 2025 VICES. All rights reserved. Promoting mindful consumption and wellness through technology.
+              &copy; 2025 VICES. All rights reserved. Promoting addiction recovery and wellness through technology.
             </p>
           </div>
         </div>
