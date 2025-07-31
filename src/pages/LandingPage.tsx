@@ -671,12 +671,6 @@ const VicesLandingPage: React.FC = () => {
                 >
                   Mobile App Coming Soon
                 </button>
-                <button 
-                  onClick={() => navigate('/usersignup')}
-                  className="border-2 border-purple-500 text-purple-300 px-6 py-3 rounded-lg font-semibold hover:bg-purple-500/10 transition-all"
-                >
-                  Join Waitlist
-                </button>
               </div>
             </div>
           </div>
